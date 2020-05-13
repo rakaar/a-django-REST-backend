@@ -1,3 +1,4 @@
+from django.core.mail import send_mail
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -5,7 +6,7 @@ from hashlib import sha256
 
 from .serializers import UserSerializer
 from .models import User
-
+import jwt
 
 class HandleUser(APIView):
     '''
@@ -37,11 +38,19 @@ class Signup(APIView):
         if is_already_exists:
             return Response({ 'message': 'already exists'}, status=status.HTTP_400_BAD_REQUEST)
             
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            original_password = request.data['password_hash']
-            password_hash = sha256(original_password.encode()).hexdigest()   # save password hash instead of the password
-            serializer.save(password_hash=password_hash)
+        
+            
+        encoded_url_verification_param = jwt.encode(request.data, 'rakaar_ki_jai', algorithm='HS256').decode()  #can change 'rakaar_ki_jai' with anything or can let it be
+        print(encoded_url_verification_param)
+        verification_url = 'localhost:8000/user/verify/' + encoded_url_verification_param 
+        send_mail(
+                'Subject here',
+                'Here is the message :' + verification_url,
+                'llr.hall.complaints@gmail.com',
+                ['rka87338@gmail.com'],
+                
+            )
+
             ## PANKAJ serializer.data is the data which contains in json format, like these 
                 #{
                 #     "name": "kkk",
@@ -54,13 +63,29 @@ class Signup(APIView):
             # END CODE
             # DELTE THIS USELESS COMMENTs LATER
             
-            return Response({ 'message': 'success'}, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+        return Response({ 'message': 'success'}, status=status.HTTP_201_CREATED)
+        
 class Login(APIView):
     '''
     POST Endpoint for login
     '''
     def post(self, request, format=None):
         print(request.data)
+
+
+class Verify(APIView):
+    '''
+    GET endpoint to verify email
+    '''
+
+    def get(self, request,hashed_code, format=None):
+        user_data = jwt.decode(hashed_code.encode(), 'rakaar_ki_jai', algorithms=['HS256'])
+        serializer = UserSerializer(data=user_data)
+        if serializer.is_valid():
+            original_password = request.data['password_hash']
+            password_hash = sha256(original_password.encode()).hexdigest()   # save password hash instead of the password
+            serializer.save(password_hash=password_hash)
+            return Response({ 'message': 'success'}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

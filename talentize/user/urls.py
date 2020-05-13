@@ -3,5 +3,6 @@ from . import views
 
 urlpatterns = [
     path('signup/', views.Signup.as_view()),
-    path('login/', views.Login.as_view())
+    path('login/', views.Login.as_view()),
+    path('verify/<str:hashed_code>/', views.Verify.as_view())
 ]
