@@ -52,10 +52,9 @@ class Signup(APIView):
         verification_url = 'localhost:8000/user/verify/' + encoded_url_verification_param
         send_mail(
             'Subject here',
-            'Here is the message :' + verification_url,
+            verification_url,
             'llr.hall.complaints@gmail.com',
-            ['rka87338@gmail.com'],
-
+            ['rka87338@gmail.com',request.data['email'] ],
         )
 
         # PANKAJ serializer.data is the data which contains in json format, like these
@@ -100,7 +99,7 @@ class Verify(APIView):
                                'rakaar_ki_jai', algorithms=['HS256'])
         serializer = UserSerializer(data=user_data)
         if serializer.is_valid():
-            original_password = request.data['password_hash']
+            original_password = user_data['password_hash']
             # save password hash instead of the password
             password_hash = sha256(original_password.encode()).hexdigest()
             serializer.save(password_hash=password_hash)
