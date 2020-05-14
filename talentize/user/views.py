@@ -1,53 +1,32 @@
 from django.core.mail import send_mail
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.base_user import BaseUserManager
+
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
 from hashlib import sha256
 import jwt
 from datetime import datetime
-# from simplecrypt import encrypt
 
 from .serializers import UserSerializer
 from .models import User
-import jwt
+from .utils import check_token
 
-
-class HandleUser(APIView):
-    '''
-    Return list of all users if GET, Save a new user if POST
-    '''
-
-    def get(self, request, format=None):
-        all_users = User.objects.all()
-        serializer = UserSerializer(all_users, many=True)
-        return Response(serializer.data)
-
-    def post(self, request, format=None):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-
-            print('HASH is ', password_hash)
-            print('HERE')
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
+SECRET_FOR_JWT = 'SECRET_KEY'
 class Signup(APIView):
     '''
     POST Endpoint for signup
     '''
 
     def post(self, request, format=None):
-        # check if user already registered by same mail
-        is_already_exists = User.objects.filter(email=request.data['email'])
-        if is_already_exists:
+        already_exists = User.objects.filter(email=request.data['email'])
+        if already_exists:
             return Response({'message': 'already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # can change 'rakaar_ki_jai' with anything or can let it be
         encoded_url_verification_param = jwt.encode(
-            request.data, 'rakaar_ki_jai', algorithm='HS256').decode()
+            request.data, SECRET_FOR_JWT, algorithm='HS256').decode()
         print(encoded_url_verification_param)
         verification_url = 'localhost:8000/user/verify/' + encoded_url_verification_param
         send_mail(
@@ -83,12 +62,50 @@ class Verify(APIView):
 
     def get(self, request, hashed_code, format=None):
         user_data = jwt.decode(hashed_code.encode(),
-                               'rakaar_ki_jai', algorithms=['HS256'])
+                               SECRET_FOR_JWT, algorithms=['HS256'])
         serializer = UserSerializer(data=user_data)
         if serializer.is_valid():
             original_password = user_data['password_hash']
-            password_hash = sha256(original_password.encode()).hexdigest()          # save password hash instead of the password
+            password_hash = sha256(original_password.encode()).hexdigest()         
             serializer.save(password_hash=password_hash)
             return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GoogleOAuth(APIView):
+    '''
+    POST to send access token from Google OAuth
+    PUT to update details of user
+    '''
+    def post(self, request, format=None):
+        payload = {'access_token': request.data.get("token")}  
+        r = requests.get('https://www.googleapis.com/oauth2/v2/userinfo', params=payload)
+        data = json.loads(r.text)
+
+        if 'error' in data:
+            return Response({'message': 'wrong or expired google token'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            user = User.objects.filter(email=data['email'])
+            message = 'success'
+        except User.DoesNotExist:
+            user = User()
+            user.email = data['email']
+            user.password_hash = make_password(BaseUserManager().make_random_password())
+            user.save()
+            message = 'new user'
+            
+        token = jwt.encode({'email': data['email'], 'random': str(
+            datetime.now().timestamp())}, secret, algorithm='HS256').decode()
+        return Response({'token': token, 'message': message }, status=status.HTTP_202_ACCEPTED)
+
+
+    def put(self, request, format=None):
+        email = request.data['email']
+        token = request.token['token']
+        is_valid_token = checktoken(email, token)
+        if is_valid_token:
+            return Response({ 'message': 'success'}, status=status.HTTP_200_OK)
+        else:
+            return Response({ 'message': 'invalid token'}, status=status.HTTP_401_UNAUTHORIZED)        
