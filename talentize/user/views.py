@@ -2,6 +2,9 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from hashlib import sha256
+import jwt
+from datetime import datetime
+# from simplecrypt import encrypt
 
 from .serializers import UserSerializer
 from .models import User
@@ -63,4 +66,12 @@ class Login(APIView):
     POST Endpoint for login
     '''
     def post(self, request, format=None):
-        print(request.data)
+        password_hash = sha256(request.data['password'].encode()).hexdigest()
+        email = request.data['email']
+        user = User.objects.filter(email=email,password_hash=password_hash)
+        if not len(user):
+            return Response({ 'message': 'invalid creds' },status=status.HTTP_401_UNAUTHORIZED)
+        secret = 'RANDOMLY_GENERATED_SECURE_STRING_BY_KAU'
+        token = jwt.encode({'email': email, 'random': str(datetime.now().timestamp())}, secret, algorithm='HS256').decode()
+        return Response({'token': token, 'message': 'success'}, status=status.HTTP_202_ACCEPTED)
+
