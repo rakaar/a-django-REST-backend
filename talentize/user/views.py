@@ -105,7 +105,7 @@ class GoogleOAuth(APIView):
 
     def put(self, request, format=None):
         email = request.data['email']
-        token = request.token['token']
+        token = request.data['token']
         is_valid_token = check_token(email, token)
         if is_valid_token:
             return Response({ 'message': 'success'}, status=status.HTTP_200_OK)
