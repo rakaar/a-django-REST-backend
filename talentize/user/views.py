@@ -77,10 +77,12 @@ class Verify(APIView):
 
 class GoogleOAuth(APIView):
     '''
-    POST to send access token from Google OAuth
-    PUT to update details of user
+    POST to send authorization code from Google OAuth via client
     '''
     def post(self, request, format=None):
+        # Tasks left
+        # Fetching authorization code from frontend
+        # Using the above to send to Google  to get Access token
         payload = {'access_token': request.data.get("token")}  
         r = requests.get('https://www.googleapis.com/oauth2/v2/userinfo', params=payload)
         data = json.loads(r.text)
@@ -93,6 +95,7 @@ class GoogleOAuth(APIView):
             message = 'success'
         except User.DoesNotExist:
             user = User()
+            user.name = data['name']
             user.email = data['email']
             user.password_hash = make_password(BaseUserManager().make_random_password())
             user.save()
@@ -100,14 +103,61 @@ class GoogleOAuth(APIView):
             
         token = jwt.encode({'email': data['email'], 'random': str(
             datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
-        return Response({'token': token, 'message': message }, status=status.HTTP_202_ACCEPTED)
+        return Response({'token': token, 'message': message, 'name': data['name'], 'email': data['email'] }, status=status.HTTP_202_ACCEPTED)
 
 
-    def put(self, request, format=None):
-        email = request.data['email']
-        token = request.data['token']
-        is_valid_token = check_token(email, token)
-        if is_valid_token:
-            return Response({ 'message': 'success'}, status=status.HTTP_200_OK)
-        else:
-            return Response({ 'message': 'invalid token'}, status=status.HTTP_401_UNAUTHORIZED)        
+
+class LinkedinOAuth(APIView):
+    '''
+    POST end point to send authorization code from LinkedIn Oauth via client
+    '''
+    
+    def post(self, request, format=None):
+        # Tasks left:
+        #  Fetching authorization code from frontend in request.data['code']
+        payload_for_code = {
+            'response_type': 'code',
+            'client_id': 'CLIENT_ID_FROM_LINEKDIN DEV',
+            'redirect_uri': 'frontend.com/profile',
+            'scope': 'r_emailaddress%20r_basicprofile' 
+        }
+        response_for_code = requests.get('https://www.linkedin.com/oauth/v2/authorization', params=payload_for_code)
+        response_for_code = json.loads(response_for_code.text)
+        auth_code = response_for_code['code']
+
+        if 'error' in response_for_code:
+            return Response({'message': 'wrong or expired google token'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        payload_for_token = {
+            'grant_type': 'code',
+            'code': auth_code,
+            'redirect_uri': 'frontend.com/profile',
+            'client_id': 'CLIENT_ID_FROM_LINEKDIN DEV',
+            'client_secret': 'FROM LINEKDIN DEV'
+        }
+        response_for_token  = requests.post('https://www.linkedin.com/oauth/v2/accessToken', data = payload_for_token) 
+        response_for_token = json.loads(response_for_token.text)
+        access_token = response_for_token['access_token']
+
+        try:
+            response_for_data = requests.get('https://api.linkedin.com/v2/me/~format=json?oauth2_access_token='+access_token)
+            response_for_data = json.loads(response_for_data.text)
+        except:
+            return Response({ 'message': 'cant connect to linkedin API' },status=status.HTTP_401_UNAUTHORIZED)
+
+        email = response_for_data['email']
+        try:
+            user = User.objects.filter(email=data['email'])
+            message = 'success'
+        except User.DoesNotExist:
+            user = User()
+            user.name = data['name']
+            user.email = data['email']
+            user.password_hash = make_password(BaseUserManager().make_random_password())
+            user.save()
+            message = 'new user'
+
+        token = jwt.encode({'email': response_for_data['email'], 'random': str(
+            datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
+        return Response({'token': token, 'message': message, 'name': response_for_data['name'], 'email': response_for_data['email'] }, status=status.HTTP_202_ACCEPTED)
+
