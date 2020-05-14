@@ -8,6 +8,8 @@ from rest_framework.response import Response
 
 from hashlib import sha256
 import jwt
+import requests
+import json
 from datetime import datetime
 
 from .serializers import UserSerializer
@@ -49,7 +51,7 @@ class Login(APIView):
         user = User.objects.filter(email=email, password_hash=password_hash)
         if not len(user):
             return Response({'message': 'invalid creds'}, status=status.HTTP_401_UNAUTHORIZED)
-        secret = 'RANDOMLY_GENERATED_SECURE_STRING_BY_KAU' # change later with actually random string or with SECRET_KEY_FOR_JWT
+        secret = 'RANDOMLY_GENERATED_SECURE_STRING_BY_KAU' # change later with actually random string or with SECRET_FOR_JWT
         token = jwt.encode({'email': email, 'random': str(
             datetime.now().timestamp())}, secret, algorithm='HS256').decode()
         return Response({'token': token, 'message': 'success'}, status=status.HTTP_202_ACCEPTED)
@@ -97,7 +99,7 @@ class GoogleOAuth(APIView):
             message = 'new user'
             
         token = jwt.encode({'email': data['email'], 'random': str(
-            datetime.now().timestamp())}, SECRET_KEY_FOR_JWT, algorithm='HS256').decode()
+            datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
         return Response({'token': token, 'message': message }, status=status.HTTP_202_ACCEPTED)
 
 
