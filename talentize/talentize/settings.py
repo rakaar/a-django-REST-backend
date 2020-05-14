@@ -134,3 +134,10 @@ STATIC_URL = '/static/'
 # CORS
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
+
+#Django MAIL
+EMAIL_HOST_USER  = 'llr.hall.complaints@gmail.com'
+EMAIL_HOST_PASSWORD = 'yollr123'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
