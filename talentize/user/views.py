@@ -54,21 +54,8 @@ class Signup(APIView):
             'Subject here',
             verification_url,
             'llr.hall.complaints@gmail.com',
-            ['rka87338@gmail.com',request.data['email'] ],
+            [ request.data['email'] ],
         )
-
-        # PANKAJ serializer.data is the data which contains in json format, like these
-        # {
-        #     "name": "kkk",
-        #     "email": "kksssssssss@m.com",
-        #     "insti_email": "jjfjf@m.com",
-        #     "password_hash": "52f104d3b9597c6a52693d75c1bfdd7a446e87c6f87793240fa7b7574ffe1cc9"
-        # }
-        # SEND MAIL HERE
-
-        # END CODE
-        # DELTE THIS USELESS COMMENTs LATER
-
         return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
 
 
@@ -100,8 +87,7 @@ class Verify(APIView):
         serializer = UserSerializer(data=user_data)
         if serializer.is_valid():
             original_password = user_data['password_hash']
-            # save password hash instead of the password
-            password_hash = sha256(original_password.encode()).hexdigest()
+            password_hash = sha256(original_password.encode()).hexdigest()          # save password hash instead of the password
             serializer.save(password_hash=password_hash)
             return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
         else:
