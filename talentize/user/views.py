@@ -33,14 +33,16 @@ class Signup(APIView):
             request.data, SECRET_FOR_JWT, algorithm='HS256').decode()
         print(encoded_url_verification_param)
         verification_url = 'localhost:8000/user/verify/' + encoded_url_verification_param
-        send_mail(
-            'Subject here',
-            verification_url,
-            'llr.hall.complaints@gmail.com',
-            [request.data['email']],
-        )
-        return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
-
+        try:
+            send_mail(
+                'Subject here',
+                verification_url,
+                'llr.hall.complaints@gmail.com',
+                [request.data['email']],
+            )
+            return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
+        except:
+            return Response({ 'message': 'invalid email'}, status=status.HTTP_400_BAD_REQUEST)
 
 class Login(APIView):
     '''
@@ -156,3 +158,12 @@ class LinkedinOAuth(APIView):
         token = jwt.encode({'email': response_for_data['email'], 'random': str(
             datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
         return Response({'token': token, 'message': message, 'name': response_for_data['name'], 'email': response_for_data['email']}, status=status.HTTP_202_ACCEPTED)
+
+
+class AppleOAuth(APIView):
+    '''
+    POST endpoint to send Authorization code
+    '''
+
+    def post(self, request, format=None):
+        pass
