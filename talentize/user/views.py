@@ -1,6 +1,7 @@
 from django.core.mail import send_mail
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.base_user import BaseUserManager
+from django.shortcuts import render
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -10,6 +11,7 @@ from hashlib import sha256
 import jwt
 import requests
 import json
+import base64
 from datetime import datetime
 
 from .serializers import UserSerializer
@@ -162,8 +164,37 @@ class LinkedinOAuth(APIView):
 
 class AppleOAuth(APIView):
     '''
-    POST endpoint to send Authorization code
+    POST endpoint to listen to redirect repsonse from Apple
     '''
-
+    sub = ''
     def post(self, request, format=None):
-        pass
+        id_token = request.data['id_token']
+        encoded_data = id_token.split('.')[1]
+        user_data = base64.b64decode(encoded_data).decode()
+        sub = json.loads(user_data)['sub']
+
+        try:
+            user = User.objects.filter(password_hash=sub)
+        except User.DoesNotExist:
+            user = User()
+            data_from_apple = request.data['user']
+            user.name = data_from_apple['name']['firstName'] + ' ' + data_from_apple['name']['lastName']
+            user.email = data_from_apple['email']
+            user.password_hash = sub
+            user.save()
+        
+    def get(self, request, format=None):
+        return (request, 'user/go_to_profile.html', { 'sub': sub })
+        # button onclick => window.location.href = frontend.com/user/apple/sub/is_new_user
+
+
+class AppleUserToProfile(APIView):
+    '''
+    POST request sent from frontend with data - sub
+    '''
+    
+    def post(self, request, sub, format=None):
+        user = User.objects.filter(password_hash=sub)
+        token = jwt.encode({'email': user.email, 'random': str(
+            datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
+        return Response({ 'message': 'success', 'token': token }, status = HTTP_200_OK)
