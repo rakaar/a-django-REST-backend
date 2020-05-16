@@ -167,8 +167,7 @@ class AppleOAuth(APIView):
     '''
     POST endpoint to listen to redirect repsonse from Apple
     '''
-    sub = ''
-
+    
     def post(self, request, format=None):
         id_token = request.data['id_token']
         encoded_data = id_token.split('.')[1]
