@@ -44,7 +44,8 @@ class Signup(APIView):
             )
             return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
         except:
-            return Response({ 'message': 'invalid email'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'invalid email'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class Login(APIView):
     '''
@@ -166,6 +167,8 @@ class AppleOAuth(APIView):
     '''
     POST endpoint to listen to redirect repsonse from Apple
     '''
+    sub = ''
+
     def post(self, request, format=None):
         id_token = request.data['id_token']
         encoded_data = id_token.split('.')[1]
@@ -177,7 +180,8 @@ class AppleOAuth(APIView):
         except User.DoesNotExist:
             user = User()
             data_from_apple = request.data['user']
-            user.name = data_from_apple['name']['firstName'] + ' ' + data_from_apple['name']['lastName']
+            user.name = data_from_apple['name']['firstName'] + \
+                ' ' + data_from_apple['name']['lastName']
             user.email = data_from_apple['email']
             user.password_hash = sub
             user.save()
@@ -190,9 +194,12 @@ class AppleUserToProfile(APIView):
     '''
     POST request sent from frontend with data - sub
     '''
-    
+
     def post(self, request, sub, format=None):
-        user = User.objects.filter(password_hash=sub)
-        token = jwt.encode({'email': user.email, 'random': str(
-            datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
-        return Response({ 'message': 'success', 'token': token }, status = HTTP_200_OK)
+        try:
+            user = User.objects.filter(password_hash=sub)
+            token = jwt.encode({'email': user.email, 'random': str(
+                datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
+            return Response({'message': 'success', 'token': token}, status=HTTP_200_OK)
+        except:
+            return Response({'message': 'Invalid user'}, status=status.HTTP_400_BAD_REQUEST)
