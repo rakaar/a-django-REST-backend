@@ -166,7 +166,6 @@ class AppleOAuth(APIView):
     '''
     POST endpoint to listen to redirect repsonse from Apple
     '''
-    sub = ''
     def post(self, request, format=None):
         id_token = request.data['id_token']
         encoded_data = id_token.split('.')[1]
@@ -182,11 +181,10 @@ class AppleOAuth(APIView):
             user.email = data_from_apple['email']
             user.password_hash = sub
             user.save()
-        
-    def get(self, request, format=None):
         return (request, 'user/go_to_profile.html', { 'sub': sub })
         # button onclick => window.location.href = frontend.com/user/apple/sub/is_new_user
-
+    
+        
 
 class AppleUserToProfile(APIView):
     '''
