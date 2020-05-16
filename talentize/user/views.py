@@ -200,6 +200,6 @@ class AppleUserToProfile(APIView):
             user = User.objects.filter(password_hash=sub)
             token = jwt.encode({'email': user.email, 'random': str(
                 datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
-            return Response({'message': 'success', 'token': token}, status=HTTP_200_OK)
+            return Response({'message': 'success', 'token': token}, status=status.HTTP_200_OK)
         except:
             return Response({'message': 'Invalid user'}, status=status.HTTP_400_BAD_REQUEST)
