@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from user.utils import check_token
-
+from user.models import User
 
 class Profile(APIView):
     '''
@@ -58,8 +58,8 @@ class Education(APIView):
         except User.DoesNotExist:
             return Response({'message': 'invalid user'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
-            user.profile.college = request.data.education['college']
-            user.profile.school = request.data.education['school']
-            user.profile.online_courses = request.data.education['online_courses']
+            user.profile.college = request.data['education']['college']
+            user.profile.school = request.data['education']['school']
+            user.profile.online_courses = request.data['education']['online_courses']
             user.save()
             return Response({ 'message': 'success'}, status=staus.HTTP_200_OK)

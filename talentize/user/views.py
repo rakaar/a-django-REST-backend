@@ -30,10 +30,8 @@ class Signup(APIView):
         already_exists = User.objects.filter(email=request.data['email'])
         if already_exists:
             return Response({'message': 'already exists'}, status=status.HTTP_400_BAD_REQUEST)
-
         encoded_url_verification_param = jwt.encode(
             request.data, SECRET_FOR_JWT, algorithm='HS256').decode()
-        print(encoded_url_verification_param)
         verification_url = 'localhost:8000/user/verify/' + encoded_url_verification_param
         try:
             send_mail(
@@ -59,9 +57,8 @@ class Login(APIView):
         if not len(user):
             return Response({'message': 'invalid creds'}, status=status.HTTP_401_UNAUTHORIZED)
         # change later with actually random string or with SECRET_FOR_JWT
-        secret = 'RANDOMLY_GENERATED_SECURE_STRING_BY_KAU'
         token = jwt.encode({'email': email, 'random': str(
-            datetime.now().timestamp())}, secret, algorithm='HS256').decode()
+            datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
         return Response({'token': token, 'message': 'success'}, status=status.HTTP_202_ACCEPTED)
 
 
