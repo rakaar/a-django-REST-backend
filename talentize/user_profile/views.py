@@ -6,6 +6,8 @@ from rest_framework.response import Response
 from user.utils import check_token
 from user.models import User
 
+from .models import OnlineCourse
+
 class Profile(APIView):
     '''
     GET endpoint to get all profile details
@@ -60,6 +62,6 @@ class Education(APIView):
         else:
             user.profile.college = request.data['education']['college']
             user.profile.school = request.data['education']['school']
-            user.profile.online_courses = request.data['education']['online_courses']
+            user.profile.online_courses = [OnlineCourse(company=x['company'], name=x['name'], partner_insti=x['partner_insti']) for x in request.data['education']['online_courses']]
             user.save()
             return Response({ 'message': 'success'}, status=status.HTTP_200_OK)
