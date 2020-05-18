@@ -16,6 +16,7 @@ from datetime import datetime
 
 from .serializers import UserSerializer
 from .models import User
+from user_profile.models import Profile
 from .utils import check_token
 
 SECRET_FOR_JWT = 'SECRET_KEY'
@@ -74,7 +75,7 @@ class Verify(APIView):
         if serializer.is_valid():
             original_password = user_data['password_hash']
             password_hash = sha256(original_password.encode()).hexdigest()
-            serializer.save(password_hash=password_hash)
+            serializer.save(password_hash=password_hash, profile=Profile())
             return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
