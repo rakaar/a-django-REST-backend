@@ -54,7 +54,7 @@ class Education(APIView):
             return Response({'message': 'invalid token'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            user = User.objects.filter(email=email)[0]
+            user = User.objects.get(email=email)
         except User.DoesNotExist:
             return Response({'message': 'invalid user'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
@@ -62,4 +62,4 @@ class Education(APIView):
             user.profile.school = request.data['education']['school']
             user.profile.online_courses = request.data['education']['online_courses']
             user.save()
-            return Response({ 'message': 'success'}, status=staus.HTTP_200_OK)
+            return Response({ 'message': 'success'}, status=status.HTTP_200_OK)
