@@ -8,12 +8,17 @@ from user.models import User
 
 from .models import OnlineCourse, Patent, Project, PoR, ResearchPaper, PrevIntern, Position, Competition, Certification, Skill
 
+
 class Profile(APIView):
     '''
-    GET endpoint to get all profile details
+    Endpoint to get all profile details
     '''
 
     def get(self, request, format=None):
+        '''
+        handle request to GET profile
+            verify user and returns user profile details
+        '''
         email = request.data['email']
         if not check_token(email, request.data['token']):
             return Response({'message': 'invalid token'}, status=status.HTTP_400_BAD_REQUEST)
@@ -29,28 +34,13 @@ class Profile(APIView):
 
 class Education(APIView):
     '''
-    POST endpoint to update education details in profile
+    Endpoint to update education details in profile
     '''
 
     def post(self, request, format=None):
         '''
-        request.data['education'] : {
-            'college': {
-                'name': string,
-                'cgpa_range': string,
-                'dept': string,
-                'core_courses': [{'name' : string}],
-                'additional_courses': [{'name' : string}]
-            },
-            'school': {
-                'name': string,
-                'board': string,
-                percentage: string
-            },
-            'online_courses': [
-                { 'name' : string, 'company': string, 'partner_insti': string }
-            ]
-        }
+        handle POST request to update user profile
+            college,school and online courses updated
         '''
         email = request.data['email']
         if not check_token(email, request.data['token']):
@@ -71,68 +61,13 @@ class Education(APIView):
 
 class Experience(APIView):
     '''
-    POST endpoint to update experience details in profile
-
-    {
-                "prev_interns":[
-                    {
-                        "company":"VALVE",
-                        "job_title":"Game Developer",
-                        "from_date":"yesterday",
-                        "to_date":"tomorrow",
-                        "nature":"wfh"
-                    }
-                ],
-                "projects":[
-                    {
-                        "project_type":"good type",
-                        "title":"good project",
-                        "description":"good desc",
-                        "associated_info":"good AI"
-                    }
-                ],
-                "por":[
-                    {
-                        "place":"home sweet home",
-                        "positions":[
-                            {
-                                "year":"2018",
-                                "description":"kid"
-                            },
-                            {
-                                "year":"2020",
-                                "description":"kid with corona"
-                            }
-                        ]
-
-                    }
-                ],
-                "research_papers":[
-                    {
-                        "journal":"lul",
-                        "title":"lol",
-                        "description":"lel",
-                        "num_of_people":25,
-                        "is_main":1,
-                        "name_of_main":"Pankaj"
-
-                    }
-                ],
-                "patents":[
-                    {
-                        "title":"GG",
-                        "description":"WP",
-                        "date":"today"
-                    }
-                ]
-
-    }
-
+    Endpoint to update experience details in profile
     '''
 
     def post(self, request, format=None):
         '''
-        Handle post request to /profile/experience
+        Handle POST request to update user profile
+            Interns, Projects, POR, Research papers, Patents updated
         '''
         email = request.data['email']
         if not check_token(email, request.data['token']):
@@ -154,64 +89,57 @@ class Experience(APIView):
             user.profile.patents = [Patent(
                 date=x['date'], title=x['title'], description=x['description']) for x in request.data['experience']['patents']]
             user.save()
-            return Response({ 'message': 'success'}, status=status.HTTP_200_OK)
+            return Response({'message': 'success'}, status=status.HTTP_200_OK)
 
 
 class Achievement(APIView):
     '''
-    POST endpoint to update achievement details in profile
+    Endpoint to update achievement details in profile
     '''
 
     def post(self, request, format=None):
         '''
-        request.data['achs'] = {
-            'competitions' : [
-                { 'title' : string, 'description': string, 'date': string }
-            ],
-            'certifications': [
-                { 'name': string, 'description' string, 'year': string }
-            ]
-        }
+        Handle POST request to update user profile
+            Competitions, Certifications updated
         '''
         email = request.data['email']
         if not check_token(email, request.data['token']):
             return Response({'message': 'invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             return Response({'message': 'invalid user'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
-            user.profile.competitions = [Competition(title=x['title'], description=x['description'], date=x['date']) for x in request.data['achs']['competitions']]
-            user.profile.certifications = [Certification(name=x['name'], description=x['description'], year=x['year']) for x in request.data['achs']['certifications']]
+            user.profile.competitions = [Competition(
+                title=x['title'], description=x['description'], date=x['date']) for x in request.data['achs']['competitions']]
+            user.profile.certifications = [Certification(
+                name=x['name'], description=x['description'], year=x['year']) for x in request.data['achs']['certifications']]
             user.save()
-            return Response({ 'message': 'success'}, status=status.HTTP_200_OK)
+            return Response({'message': 'success'}, status=status.HTTP_200_OK)
 
 
 class Personal(APIView):
     '''
-    POST endpoint to update Personal details in Profile
+    Endpoint to update Personal details in profile
     '''
 
     def post(self, request, format=None):
         '''
-        request.data['personal'] = {
-            'skills' : [
-                { 'name' string }
-            ],
-            'location: string
-        }
+        Handle POST request to update user profile
+            Location, Skills updated
         '''
         email = request.data['email']
         if not check_token(email, request.data['token']):
             return Response({'message': 'invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             return Response({'message': 'invalid user'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
             user.profile.location = request.data['personal']['location']
-            user.profile.skills = [Skill(name=x['name']) for x in request.data['personal']['skills']]
+            user.profile.skills = [Skill(name=x['name'])
+                                   for x in request.data['personal']['skills']]
             user.save()
-            return Response({ 'message': 'success'}, status=status.HTTP_200_OK)
+            return Response({'message': 'success'}, status=status.HTTP_200_OK)

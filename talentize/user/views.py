@@ -24,10 +24,14 @@ SECRET_FOR_JWT = 'SECRET_KEY'
 
 class Signup(APIView):
     '''
-    POST Endpoint for signup
+    Endpoint for signup
     '''
 
     def post(self, request, format=None):
+        '''
+        function to handle signup 
+            send verification email to user
+        '''
         already_exists = User.objects.filter(email=request.data['email'])
         if already_exists:
             return Response({'message': 'already exists'}, status=status.HTTP_400_BAD_REQUEST)
@@ -48,10 +52,13 @@ class Signup(APIView):
 
 class Login(APIView):
     '''
-    POST Endpoint for login
+    Endpoint for login
     '''
 
     def post(self, request, format=None):
+        '''
+        function to handle login request
+        '''
         password_hash = sha256(request.data['password'].encode()).hexdigest()
         email = request.data['email']
         user = User.objects.filter(email=email, password_hash=password_hash)
@@ -65,10 +72,14 @@ class Login(APIView):
 
 class Verify(APIView):
     '''
-    GET endpoint to verify email
+    Endpoint to verify user email for signing up
     '''
 
     def get(self, request, hashed_code, format=None):
+        '''
+        function to handle GET request 
+            verifies email and stores user in DB
+        '''
         user_data = jwt.decode(hashed_code.encode(),
                                SECRET_FOR_JWT, algorithms=['HS256'])
         serializer = UserSerializer(data=user_data)
@@ -83,10 +94,13 @@ class Verify(APIView):
 
 class GoogleOAuth(APIView):
     '''
-    POST to send authorization code from Google OAuth via client
+    Endpoint to send authorization code from Google OAuth via client
     '''
 
     def post(self, request, format=None):
+        '''
+        function to handle POST request for Google Oauth
+        '''
         # Tasks left
         # Fetching authorization code from frontend
         # Using the above to send to Google  to get Access token
@@ -117,13 +131,16 @@ class GoogleOAuth(APIView):
 
 class LinkedinOAuth(APIView):
     '''
-    POST end point to send authorization code from LinkedIn Oauth via client
+    Endpoint to send authorization code from LinkedIn Oauth via client
     '''
 
     def post(self, request, format=None):
+        '''
+        function to handle POST request for Linkedin Oauth
+        '''
         # Tasks left:
         # Fetching authorization code in frontend from linkedin
-        #  Fetching authorization token from frontend in request.data['auth_code'] - line 121
+        #  Fetching authorization token from frontend in request.data['auth_code']- 3 lines below this
         payload_for_token = {
             'grant_type': 'code',
             'code': request.data['auth_code'],
@@ -163,10 +180,14 @@ class LinkedinOAuth(APIView):
 
 class AppleOAuth(APIView):
     '''
-    POST endpoint to listen to redirect repsonse from Apple
+    Endpoint to listen to redirect repsonse from Apple
     '''
-    
+
     def post(self, request, format=None):
+        '''
+        function to handle
+            POST request from apple upon authentication
+        '''
         id_token = request.data['id_token']
         encoded_data = id_token.split('.')[1]
         user_data = base64.b64decode(encoded_data).decode()
@@ -182,17 +203,20 @@ class AppleOAuth(APIView):
             user.email = data_from_apple['email']
             user.password_hash = sub
             user.save()
-        return (request, 'user/go_to_profile.html', { 'sub': sub })
+        return (request, 'user/go_to_profile.html', {'sub': sub})
         # button onclick => window.location.href = frontend.com/user/apple/sub/is_new_user
-    
-        
+
 
 class AppleUserToProfile(APIView):
     '''
-    POST request sent from frontend with data - sub
+    Endpoint to handle redirect to profile page after apple authentication
     '''
 
     def post(self, request, sub, format=None):
+        '''
+        function to handle
+            POST request sent from frontend with data - sub
+        '''
         try:
             user = User.objects.filter(password_hash=sub)
             token = jwt.encode({'email': user.email, 'random': str(
