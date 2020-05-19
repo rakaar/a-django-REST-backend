@@ -16,6 +16,7 @@ from datetime import datetime
 
 from .serializers import UserSerializer
 from .models import User
+from user_profile.models import Profile
 from .utils import check_token
 
 SECRET_FOR_JWT = 'SECRET_KEY'
@@ -30,10 +31,8 @@ class Signup(APIView):
         already_exists = User.objects.filter(email=request.data['email'])
         if already_exists:
             return Response({'message': 'already exists'}, status=status.HTTP_400_BAD_REQUEST)
-
         encoded_url_verification_param = jwt.encode(
             request.data, SECRET_FOR_JWT, algorithm='HS256').decode()
-        print(encoded_url_verification_param)
         verification_url = 'localhost:8000/user/verify/' + encoded_url_verification_param
         try:
             send_mail(
@@ -59,9 +58,8 @@ class Login(APIView):
         if not len(user):
             return Response({'message': 'invalid creds'}, status=status.HTTP_401_UNAUTHORIZED)
         # change later with actually random string or with SECRET_FOR_JWT
-        secret = 'RANDOMLY_GENERATED_SECURE_STRING_BY_KAU'
         token = jwt.encode({'email': email, 'random': str(
-            datetime.now().timestamp())}, secret, algorithm='HS256').decode()
+            datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
         return Response({'token': token, 'message': 'success'}, status=status.HTTP_202_ACCEPTED)
 
 
@@ -77,7 +75,7 @@ class Verify(APIView):
         if serializer.is_valid():
             original_password = user_data['password_hash']
             password_hash = sha256(original_password.encode()).hexdigest()
-            serializer.save(password_hash=password_hash)
+            serializer.save(password_hash=password_hash, profile=Profile())
             return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -167,8 +165,7 @@ class AppleOAuth(APIView):
     '''
     POST endpoint to listen to redirect repsonse from Apple
     '''
-    sub = ''
-
+    
     def post(self, request, format=None):
         id_token = request.data['id_token']
         encoded_data = id_token.split('.')[1]
