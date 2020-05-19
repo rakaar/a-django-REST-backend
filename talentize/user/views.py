@@ -1,4 +1,6 @@
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.base_user import BaseUserManager
 from django.shortcuts import render
@@ -37,13 +39,17 @@ class Signup(APIView):
             return Response({'message': 'already exists'}, status=status.HTTP_400_BAD_REQUEST)
         encoded_url_verification_param = jwt.encode(
             request.data, SECRET_FOR_JWT, algorithm='HS256').decode()
-        verification_url = 'localhost:8000/user/verify/' + encoded_url_verification_param
+        verification_url = 'http://localhost:8000/user/verify/' + encoded_url_verification_param
+        html_message = render_to_string('email_verification.html', {'url_value':verification_url})
+        plain_message = strip_tags(html_message)
+        subject='Verification for Talentize.ai'
         try:
             send_mail(
-                'Subject here',
-                verification_url,
+                subject,
+                plain_message,
                 'llr.hall.complaints@gmail.com',
                 [request.data['email']],
+                html_message=html_message
             )
             return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
         except:
