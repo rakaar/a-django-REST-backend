@@ -55,7 +55,8 @@ class Education(APIView):
             user.profile.online_courses = [OnlineCourse(
                 company=x['company'], name=x['name'], partner_insti=x['partner_insti']) for x in request.data['education']['online_courses']]
             user.profile.colleges = [College(
-                name=x['name'], cgpa_range=x['cgpa_range'], dept=x['dept'], type_of_degree=x['type_of_degree'],
+                name=x['name'], cgpa_range=x['cgpa_range'], dept=x['dept'], from_date=x[
+                    'from_date'], to_date=x['to_date'], type_of_degree=x['type_of_degree'],
                 core_courses=[CollegeCourse(name=y['name'])
                               for y in x['core_courses']],
                 additional_courses=[CollegeCourse(name=y['name']) for y in x['additional_courses']]) for x in request.data['education']['colleges']]

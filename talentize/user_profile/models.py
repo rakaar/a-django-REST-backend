@@ -23,6 +23,8 @@ class College(models.Model):
     core_courses = models.ArrayField(model_container=CollegeCourse, blank=True)
     additional_courses = models.ArrayField(model_container=CollegeCourse, blank=True)
     type_of_degree = models.CharField(max_length=200, blank=True)
+    from_date = models.CharField(max_length=200, blank=True)
+    to_date = models.CharField(max_length=200, blank=True)
 
 
 class Project(models.Model):
