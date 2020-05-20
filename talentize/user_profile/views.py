@@ -141,9 +141,9 @@ class Personal(APIView):
             user.profile.location = request.data['personal']['location']
             user.profile.skills = [Skill(name=x['name']) for x in request.data['personal']['skills']]
             user.profile.bio = request.data['personal']['bio']
-            pref_sectors_instance = [Preferences(prefered_sectors=[ Place(name=x['name'])  for x in request.data['personal']['preferences']['prefered_sectors'] ])]
-            pref_interns_instance = [Preferences(prefered_interns=[ Place(name=x['name'])  for x in request.data['personal']['preferences']['prefered_interns'] ])]
-            pref_jobs_instance = [Preferences(prefered_jobs=[ Place(name=x['name'])  for x in request.data['personal']['preferences']['prefered_jobs'] ])]
-            user.profile.preferences = [Preferences(prefered_sectors=pref_sectors_instance, prefered_interns=pref_interns_instance, prefered_jobs=pref_jobs_instance)]
+            pref_sectors_instance = [ Place(name=x['name']) for x in request.data['personal']['preferences']['prefered_sectors'] ]
+            pref_interns_instance = [ Place(name=x['name']) for x in request.data['personal']['preferences']['prefered_interns'] ]
+            pref_jobs_instance = [ Place(name=x['name'])  for x in request.data['personal']['preferences']['prefered_jobs'] ]
+            user.profile.preferences = [ Preferences(prefered_sectors=pref_sectors_instance, prefered_interns=pref_interns_instance, prefered_jobs=pref_jobs_instance) ]
             user.save()
             return Response({'message': 'success'}, status=status.HTTP_200_OK)
