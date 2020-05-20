@@ -104,4 +104,4 @@ class Profile(models.Model):
     competitions = models.ArrayField(model_container=Competition, blank=True)
     certifications = models.ArrayField(model_container=Certification, blank=True)
     skills = models.ArrayField(model_container=Skill, blank=True)
-    preferences = models.ArrayField(model_container=Preferences, blank=True)
+    preferences = models.ArrayField(model_container=Preferences, blank=True, default=None)
