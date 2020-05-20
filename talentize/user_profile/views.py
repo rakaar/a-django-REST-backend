@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from user.utils import check_token
 from user.models import User
 
-from .models import OnlineCourse, Patent, Project, PoR, ResearchPaper, PrevIntern, Position, Competition, Certification, Skill
+from .models import OnlineCourse, Patent, Project, PoR, ResearchPaper, PrevIntern, Position, Competition, Certification, Skill, Place, Preferences
 
 
 class Profile(APIView):
@@ -139,8 +139,12 @@ class Personal(APIView):
             return Response({'message': 'invalid user'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
             user.profile.location = request.data['personal']['location']
-            user.profile.skills = [Skill(name=x['name'])
-                                   for x in request.data['personal']['skills']]
+            user.profile.skills = [Skill(name=x['name']) for x in request.data['personal']['skills']]
             user.profile.bio = request.data['personal']['bio']
+            user.profile.preferences.prefered_sectors = [Preferences(prefered_sectors=[ Place(name=x['name'])  for x in request.data['personal']['preferences']['prefered_sectors'] ])]
+            user.profile.preferences.prefered_interns = [Preferences(prefered_interns=[ Place(name=x['name'])  for x in request.data['personal']['preferences']['prefered_interns'] ])]
+            user.profile.preferences.prefered_jobs = [Preferences(prefered_sectors=[ Place(name=x['name'])  for x in request.data['personal']['preferences']['prefered_jobs'] ])]
+
+
             user.save()
             return Response({'message': 'success'}, status=status.HTTP_200_OK)

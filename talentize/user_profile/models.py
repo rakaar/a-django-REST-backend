@@ -65,7 +65,7 @@ class Certification(models.Model):
     name = models.CharField(max_length=200, blank=True)
     year = models.CharField(max_length=200, blank=True)
     description = models.CharField(max_length=200, blank=True)
-    issuing_auth =models.CharField(max_length=200, blank=True)
+    issuing_auth = models.CharField(max_length=200, blank=True)
 
 class Skill(models.Model):
     name = models.CharField(max_length=200, blank=True)
@@ -104,3 +104,4 @@ class Profile(models.Model):
     competitions = models.ArrayField(model_container=Competition, blank=True)
     certifications = models.ArrayField(model_container=Certification, blank=True)
     skills = models.ArrayField(model_container=Skill, blank=True)
+    preferences = models.ArrayField(model_container=Preferences, blank=True)
