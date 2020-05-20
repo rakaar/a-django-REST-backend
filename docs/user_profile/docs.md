@@ -141,14 +141,16 @@ Data to be sent in this format
       {
         "title": "string",
         "description": "string",
-        "date": "string"
+        "date": "string",
+        "issuing_auth": "string"
       }
     ],
     "certifications": [
       {
         "name": "string",
         "description": "string",
-        "year": "string"
+        "year": "string",
+        "issuing_auth": "string"
       }
     ]
   }
@@ -172,7 +174,8 @@ Data to be sent in this format
         "name": "string"
       }
     ],
-    "location": "string"
+    "location": "string",
+    "bio": "string"
   }
 }
 ```

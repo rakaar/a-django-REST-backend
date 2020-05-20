@@ -112,9 +112,9 @@ class Achievement(APIView):
             return Response({'message': 'invalid user'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
             user.profile.competitions = [Competition(
-                title=x['title'], description=x['description'], date=x['date']) for x in request.data['achs']['competitions']]
+                title=x['title'], description=x['description'], date=x['date'], issuing_auth=x['issuing_auth']) for x in request.data['achs']['competitions']]
             user.profile.certifications = [Certification(
-                name=x['name'], description=x['description'], year=x['year']) for x in request.data['achs']['certifications']]
+                name=x['name'], description=x['description'], year=x['year'], issuing_auth=x['issuing_auth']) for x in request.data['achs']['certifications']]
             user.save()
             return Response({'message': 'success'}, status=status.HTTP_200_OK)
 
@@ -141,5 +141,6 @@ class Personal(APIView):
             user.profile.location = request.data['personal']['location']
             user.profile.skills = [Skill(name=x['name'])
                                    for x in request.data['personal']['skills']]
+            user.profile.bio = request.data['personal']['bio']
             user.save()
             return Response({'message': 'success'}, status=status.HTTP_200_OK)
