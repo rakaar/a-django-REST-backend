@@ -20,7 +20,8 @@ Data to be sent in this format
   "email": "string@string.com",
   "token": "string",
   "education": {
-    "college": {
+    "colleges": [
+      {
       "name": "string",
       "cgpa_range": "string",
       "dept": "string",
@@ -39,8 +40,32 @@ Data to be sent in this format
         {
           "name": "string"
         }
-      ]
+      ],
+      "type_of_degree": "string"
     },
+    {
+      "name": "string",
+      "cgpa_range": "string",
+      "dept": "string",
+      "core_courses": [
+        {
+          "name": "string"
+        },
+        {
+          "name": "string"
+        }
+      ],
+      "additional_courses": [
+        {
+          "name": "string"
+        },
+        {
+          "name": "string"
+        }
+      ],
+      "type_of_degree": "string"
+    }
+    ],
     "school": {
       "name": "string",
       "board": "string",
