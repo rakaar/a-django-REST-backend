@@ -172,10 +172,30 @@ Data to be sent in this format
     "skills": [
       {
         "name": "string"
+      },
+      {
+        "name": "string"
       }
     ],
     "location": "string",
-    "bio": "string"
+    "bio": "string",
+    "preferences": {
+      "prefered_sectors": [
+        {
+          "name": "string"
+        }
+      ],
+      "prefered_interns": [
+        {
+          "name": "string"
+        }
+      ],
+      "prefered_jobs": [
+        {
+          "name": "string"
+        }
+      ]
+    }
   }
 }
 ```
