@@ -65,7 +65,7 @@ class Certification(models.Model):
     name = models.CharField(max_length=200, blank=True)
     year = models.CharField(max_length=200, blank=True)
     description = models.CharField(max_length=200, blank=True)
-
+    issuing_auth =models.CharField(max_length=200, blank=True)
 
 class Skill(models.Model):
     name = models.CharField(max_length=200, blank=True)
@@ -80,10 +80,19 @@ class Competition(models.Model):
     title = models.CharField(max_length=200, blank=True)
     description = models.CharField(max_length=600, blank=True)
     date = models.CharField(max_length=200, blank=True)
+    issuing_auth = models.CharField(max_length=200, blank=True)
 
+class Place(models.Model):
+    name = models.CharField(max_length=200, blank=True)
+
+class Preferences(models.Model):
+    prefered_sectors = models.ArrayField(model_container=Place, blank=True)
+    prefered_interns = models.ArrayField(model_container=Place, blank=True)
+    prefered_jobs = models.ArrayField(model_container=Place, blank=True)
 
 class Profile(models.Model):
     location = models.CharField(max_length=200, blank=True)
+    bio = models.CharField(max_length=500, blank=True)
     school = models.EmbeddedField(model_container=School, blank=True)
     college = models.EmbeddedField(model_container=College, blank=True)
     projects = models.ArrayField(model_container=Project, blank=True)
