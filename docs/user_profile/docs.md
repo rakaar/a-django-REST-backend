@@ -41,7 +41,9 @@ Data to be sent in this format
           "name": "string"
         }
       ],
-      "type_of_degree": "string"
+      "type_of_degree": "string",
+      "from_date": "string",
+      "to_date": "string"
     },
     {
       "name": "string",
@@ -63,7 +65,9 @@ Data to be sent in this format
           "name": "string"
         }
       ],
-      "type_of_degree": "string"
+      "type_of_degree": "string",
+      "from_date": "string",
+      "to_date": "string"
     }
     ],
     "school": {
@@ -135,7 +139,15 @@ Data to be sent in this format
         "journal": "string",
         "title": "string",
         "description": "string",
-        "num_of_people": 2,
+        "num_of_people": integer,
+        "is_main": bool,
+        "name_of_main": "string"
+      },
+      {
+        "journal": "string",
+        "title": "string",
+        "description": "string",
+        "num_of_people": 12,
         "is_main": 1,
         "name_of_main": "string"
       }
