@@ -178,7 +178,7 @@ class ProPic(APIView):
         except User.DoesNotExist:
             return Response({'message': 'invalid user'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
-            user.pro_pic = User(pro_pic=request.data['pro_pic'])
+            user.profile.pro_pic = request.data['pro_pic']
             user.save()
             return Response({'message': 'success'}, status=status.HTTP_200_OK)
 
@@ -196,7 +196,7 @@ class ProPic(APIView):
         except User.DoesNotExist:
             return Response({'message': 'invalid user'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
-            pro_pic = 'http://localhost:8000/media/' + user.pro_pic
+            pro_pic = 'http://localhost:8000/media/' + str(user.profile.pro_pic)
             return Response({'pro_pic': pro_pic}, status=status.HTTP_200_OK)
             
 
