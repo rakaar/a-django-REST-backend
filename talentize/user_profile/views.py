@@ -7,7 +7,7 @@ from user.utils import check_token
 from user.models import User
 
 from .models import OnlineCourse, Patent, Project, PoR, ResearchPaper, PrevIntern, Position, Competition, Certification, Skill, Place, Preferences, College, CollegeCourse
-
+from .models import Profile as ProfileModel
 
 class Profile(APIView):
     '''
@@ -158,3 +158,45 @@ class Personal(APIView):
                 prefered_sectors=pref_sectors_instance, prefered_interns=pref_interns_instance, prefered_jobs=pref_jobs_instance)]
             user.save()
             return Response({'message': 'success'}, status=status.HTTP_200_OK)
+
+
+class ProPic(APIView):
+    '''
+    Endpoints to handle profile pic upload
+    '''
+
+    def post(self, request, format=None):
+        '''
+        POST request to upload file to the server
+        '''
+        email = request.data['email']
+        if not check_token(email, request.data['token']):
+            return Response({'message': 'invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'message': 'invalid user'}, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            user.pro_pic = User(pro_pic=request.data['pro_pic'])
+            user.save()
+            return Response({'message': 'success'}, status=status.HTTP_200_OK)
+
+    
+    def get(self, request, format=None):
+        '''
+        GET endpoint to fetch name
+        '''
+        email = request.data['email']
+        if not check_token(email, request.data['token']):
+            return Response({'message': 'invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'message': 'invalid user'}, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            pro_pic = 'http://localhost:8000/media/' + user.pro_pic
+            return Response({'pro_pic': pro_pic}, status=status.HTTP_200_OK)
+            
+

@@ -93,6 +93,9 @@ class Preferences(models.Model):
     prefered_interns = models.ArrayField(model_container=Place, blank=True)
     prefered_jobs = models.ArrayField(model_container=Place, blank=True)
 
+def upload_path(instance, filename):
+    return '/'.join(['pro_pic', filename])
+
 class Profile(models.Model):
     location = models.CharField(max_length=200, blank=True)
     bio = models.CharField(max_length=500, blank=True)
@@ -108,3 +111,4 @@ class Profile(models.Model):
     certifications = models.ArrayField(model_container=Certification, blank=True)
     skills = models.ArrayField(model_container=Skill, blank=True)
     preferences = models.ArrayField(model_container=Preferences, blank=True, default=None)
+    pro_pic = models.ImageField(blank=True, null=True, upload_to=upload_path)
