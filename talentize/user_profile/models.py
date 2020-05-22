@@ -22,6 +22,9 @@ class College(models.Model):
     dept = models.CharField(max_length=200, blank=True)
     core_courses = models.ArrayField(model_container=CollegeCourse, blank=True)
     additional_courses = models.ArrayField(model_container=CollegeCourse, blank=True)
+    type_of_degree = models.CharField(max_length=200, blank=True)
+    from_date = models.CharField(max_length=200, blank=True)
+    to_date = models.CharField(max_length=200, blank=True)
 
 
 class Project(models.Model):
@@ -65,7 +68,7 @@ class Certification(models.Model):
     name = models.CharField(max_length=200, blank=True)
     year = models.CharField(max_length=200, blank=True)
     description = models.CharField(max_length=200, blank=True)
-
+    issuing_auth = models.CharField(max_length=200, blank=True)
 
 class Skill(models.Model):
     name = models.CharField(max_length=200, blank=True)
@@ -80,12 +83,24 @@ class Competition(models.Model):
     title = models.CharField(max_length=200, blank=True)
     description = models.CharField(max_length=600, blank=True)
     date = models.CharField(max_length=200, blank=True)
+    issuing_auth = models.CharField(max_length=200, blank=True)
 
+class Place(models.Model):
+    name = models.CharField(max_length=200, blank=True)
+
+class Preferences(models.Model):
+    prefered_sectors = models.ArrayField(model_container=Place, blank=True)
+    prefered_interns = models.ArrayField(model_container=Place, blank=True)
+    prefered_jobs = models.ArrayField(model_container=Place, blank=True)
+
+def upload_path(instance, filename):
+    return '/'.join(['pro_pic', filename])
 
 class Profile(models.Model):
     location = models.CharField(max_length=200, blank=True)
+    bio = models.CharField(max_length=500, blank=True)
     school = models.EmbeddedField(model_container=School, blank=True)
-    college = models.EmbeddedField(model_container=College, blank=True)
+    colleges = models.ArrayField(model_container=College, blank=True)
     projects = models.ArrayField(model_container=Project, blank=True)
     research_papers = models.ArrayField(model_container=ResearchPaper, blank=True)
     patents = models.ArrayField(model_container=Patent, blank=True)
@@ -95,3 +110,5 @@ class Profile(models.Model):
     competitions = models.ArrayField(model_container=Competition, blank=True)
     certifications = models.ArrayField(model_container=Certification, blank=True)
     skills = models.ArrayField(model_container=Skill, blank=True)
+    preferences = models.ArrayField(model_container=Preferences, blank=True, default=None)
+    pro_pic = models.ImageField(blank=True, null=True, upload_to=upload_path)

@@ -20,7 +20,8 @@ Data to be sent in this format
   "email": "string@string.com",
   "token": "string",
   "education": {
-    "college": {
+    "colleges": [
+      {
       "name": "string",
       "cgpa_range": "string",
       "dept": "string",
@@ -39,8 +40,36 @@ Data to be sent in this format
         {
           "name": "string"
         }
-      ]
+      ],
+      "type_of_degree": "string",
+      "from_date": "string",
+      "to_date": "string"
     },
+    {
+      "name": "string",
+      "cgpa_range": "string",
+      "dept": "string",
+      "core_courses": [
+        {
+          "name": "string"
+        },
+        {
+          "name": "string"
+        }
+      ],
+      "additional_courses": [
+        {
+          "name": "string"
+        },
+        {
+          "name": "string"
+        }
+      ],
+      "type_of_degree": "string",
+      "from_date": "string",
+      "to_date": "string"
+    }
+    ],
     "school": {
       "name": "string",
       "board": "string",
@@ -110,7 +139,15 @@ Data to be sent in this format
         "journal": "string",
         "title": "string",
         "description": "string",
-        "num_of_people": 2,
+        "num_of_people": integer,
+        "is_main": bool,
+        "name_of_main": "string"
+      },
+      {
+        "journal": "string",
+        "title": "string",
+        "description": "string",
+        "num_of_people": 12,
         "is_main": 1,
         "name_of_main": "string"
       }
@@ -141,14 +178,16 @@ Data to be sent in this format
       {
         "title": "string",
         "description": "string",
-        "date": "string"
+        "date": "string",
+        "issuing_auth": "string"
       }
     ],
     "certifications": [
       {
         "name": "string",
         "description": "string",
-        "year": "string"
+        "year": "string",
+        "issuing_auth": "string"
       }
     ]
   }
@@ -170,9 +209,30 @@ Data to be sent in this format
     "skills": [
       {
         "name": "string"
+      },
+      {
+        "name": "string"
       }
     ],
-    "location": "string"
+    "location": "string",
+    "bio": "string",
+    "preferences": {
+      "prefered_sectors": [
+        {
+          "name": "string"
+        }
+      ],
+      "prefered_interns": [
+        {
+          "name": "string"
+        }
+      ],
+      "prefered_jobs": [
+        {
+          "name": "string"
+        }
+      ]
+    }
   }
 }
 ```
