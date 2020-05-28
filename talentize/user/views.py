@@ -22,7 +22,7 @@ from user_profile.models import Profile
 from .utils import check_token
 
 SECRET_FOR_JWT = 'SECRET_KEY'
-
+MESIBO_APPTOKEN = 'q6qk2jt17bu19y0nbscbl7l51g9jfo3gufuoxizctlfhh0fs2ggqolzlr10uf5dh'
 
 class Signup(APIView):
     '''
@@ -92,7 +92,17 @@ class Verify(APIView):
         if serializer.is_valid():
             original_password = user_data['password_hash']
             password_hash = sha256(original_password.encode()).hexdigest()
-            serializer.save(password_hash=password_hash, profile=Profile())
+            # Obtain mesibo access token
+            data = {
+                "op": "useradd",
+                "token": MESIBO_APPTOKEN,
+                "addr": user_data['email'],
+                "appid": "8117"
+            }
+            res = requests.post('https://api.mesibo.com/api.php', data=data)
+            mesibo_uid = res.json()['user']['uid']
+            mesibo_token = res.json()['user']['token']
+            serializer.save(password_hash=password_hash, mesibo_uid=mesibo_uid, mesibo_token=mesibo_token,profile=Profile())
             return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
