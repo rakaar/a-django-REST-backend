@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # Applications 
     'user.apps.UserConfig',
     'user_profile.apps.UserProfileConfig',
+    'chat.apps.ChatConfig',
     
     # packages 
     'rest_framework',
