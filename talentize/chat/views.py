@@ -55,11 +55,12 @@ class MesiboUser(APIView):
     Endpoints to handle user operations related to group
     '''
 
-    def get(self, request, email, format=None):
+    def get(self, request, format=None):
         '''
         Endpoint toget groups of a user
         '''
         try:
+            email = request.data['email']
             user = User.objects.get(email=email)
             groups = [(x.gid, x.status) for x in user.mesibo_details.groups]
             return Response({'groups': groups}, status=status.HTTP_200_OK)
