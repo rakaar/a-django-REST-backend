@@ -48,3 +48,15 @@ Data to be sent in this format
 Responses
 - { "message": "success" } if user added to group successfully
 - { "message": "failure", "status": 400 } otherwise
+
+#### GET `/chat/user`
+Returns all  groups of the user
+GET request to be sent with this body
+```
+{
+    "email": "string@string.com"
+}
+```
+Response
+- { "groups": [[gid1, active_status_1], [integer, bool], [675, true]]} if fetch is succcessful
+- { "message" : "not found" } if wrong user email is recieved 
