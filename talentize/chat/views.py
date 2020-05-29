@@ -22,13 +22,14 @@ class MesiboGroup(APIView):
         data['op'] = 'groupadd'
         data['token'] = MESIBO_APPTOKEN
         try:
-            response = request.post('https://api.mesibo.com/api.php', data=data)
+            response = requests.post('https://api.mesibo.com/api.php', data=data)
             gid = response.json()['group']['gid']
             name = data['name']
             group = Group(gid=gid, name=name)
             group.save()
             return Response({ 'message': 'success', 'gid': gid, 'name': name}, status=status.HTTP_200_OK)
-        except:
+        except Exception as e:
+            print('excpetion is ',e)
             return Response({ 'message': 'failure' }, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -39,7 +40,7 @@ class MesiboGroup(APIView):
         try:
             gid = request.data['gid']
             groups = Group.objects.filter(gid=gid)
-            users = [x.email for x in groups]
+            users = [x.uni_ids for x in groups]
             return Response({'users': users}, status=status.HTTP_200_OK)
         except:
             return Response({'message': 'not found'}, status=status.HTTP_400_BAD_REQUEST)
