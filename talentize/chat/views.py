@@ -8,6 +8,7 @@ import requests
 
 from user.utils import MESIBO_APPTOKEN, MESIBO_APP_ID
 from .models import Group, Mail
+from user.models import User
 
 
 class MesiboGroup(APIView):
@@ -41,7 +42,6 @@ class MesiboGroup(APIView):
         To get users of a group
         '''
         try:
-            print('gid is ', gid)
             group = Group.objects.get(gid=gid)
             users = [x.email for x in group.uni_ids]
             return Response({'users': users}, status=status.HTTP_200_OK)
@@ -54,6 +54,18 @@ class MesiboUser(APIView):
     '''
     Endpoints to handle user operations related to group
     '''
+
+    def get(self, request, email, format=None):
+        '''
+        Endpoint toget groups of a user
+        '''
+        try:
+            user = User.objects.get(email=email)
+            groups = [(x.gid, x.status) for x in user.mesibo_details.groups]
+            return Response({'groups': groups}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print('issue is ', e)
+            return Response({'message': 'not found'}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, format=None):
         '''
