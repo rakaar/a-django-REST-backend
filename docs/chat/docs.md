@@ -25,3 +25,26 @@ Response
 - { "users": ["string1@string1.com", "string2@string2.com" ]} if fetch is succcessful
 - { "message" : "not found" } if wrong group id is mentioned
 
+#### POST `/chat/user`
+Data to be sent in this format
+```
+{
+  "gid": integer,
+  "m" : "string@string.com"
+}
+```
+Responses
+- { "message": "success" } if user added to group successfully
+- { "message": "failure", "status": 400 } otherwise
+
+#### PUT `/chat/user`
+Data to be sent in this format
+```
+{
+  "gid": integer,
+  "m" : "string@string.com"
+}
+```
+Responses
+- { "message": "success" } if user added to group successfully
+- { "message": "failure", "status": 400 } otherwise
