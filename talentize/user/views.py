@@ -19,10 +19,9 @@ from datetime import datetime
 from .serializers import UserSerializer
 from .models import User
 from user_profile.models import Profile
-from .utils import check_token
+from .utils import check_token, MESIBO_APP_ID, MESIBO_APPTOKEN
+from .utils import SECRET_KEY_FOR_JWT as SECRET_FOR_JWT
 
-SECRET_FOR_JWT = 'SECRET_KEY'
-MESIBO_APPTOKEN = 'q6qk2jt17bu19y0nbscbl7l51g9jfo3gufuoxizctlfhh0fs2ggqolzlr10uf5dh'
 
 class Signup(APIView):
     '''
@@ -97,7 +96,7 @@ class Verify(APIView):
                 "op": "useradd",
                 "token": MESIBO_APPTOKEN,
                 "addr": user_data['email'],
-                "appid": "8117"
+                "appid": MESIBO_APP_ID
             }
             res = requests.post('https://api.mesibo.com/api.php', data=data)
             mesibo_uid = res.json()['user']['uid']
