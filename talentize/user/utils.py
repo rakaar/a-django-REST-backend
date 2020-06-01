@@ -2,6 +2,9 @@ import jwt
 
 SECRET_KEY_FOR_JWT = 'SECRET_KEY'
 
+MESIBO_APP_ID = "8117"
+MESIBO_APPTOKEN = 'q6qk2jt17bu19y0nbscbl7l51g9jfo3gufuoxizctlfhh0fs2ggqolzlr10uf5dh'
+
 
 def check_token(email, token):
     '''
