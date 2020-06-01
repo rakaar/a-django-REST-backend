@@ -5,11 +5,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 import requests
+from logging import getLogger
 
 from user.utils import MESIBO_APPTOKEN, MESIBO_APP_ID
 from .models import Group, Mail
 from user.models import User
 
+logger = getLogger(__name__)
 
 class MesiboGroup(APIView):
     '''
@@ -34,7 +36,7 @@ class MesiboGroup(APIView):
             group.save()
             return Response({'message': 'success', 'gid': gid, 'name': name}, status=status.HTTP_200_OK)
         except Exception as e:
-            print('excpetion is ', e)
+            logger.error('Error in MesiboGroup POST is ', e)
             return Response({'message': 'failure'}, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request, gid, format=None):
@@ -46,7 +48,7 @@ class MesiboGroup(APIView):
             users = [x.email for x in group.uni_ids]
             return Response({'users': users}, status=status.HTTP_200_OK)
         except Exception as e:
-            print('issue is ', e)
+            logger.error('Error in MesiboGroup GET is ',e)
             return Response({'message': 'not found'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -65,7 +67,7 @@ class MesiboUser(APIView):
             groups = [(x.gid, x.status) for x in user.mesibo_details.groups]
             return Response({'groups': groups}, status=status.HTTP_200_OK)
         except Exception as e:
-            print('issue is ', e)
+            logger.error('Error in MesiboUser GET is ',e)
             return Response({'message': 'not found'}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, format=None):
@@ -88,6 +90,7 @@ class MesiboUser(APIView):
             group.save()
             return Response({'message': 'success'}, status=status.HTTP_200_OK)
         except Exception as e:
+            logger.error('Error in MesiboUser POST is ',e)
             return Response({'message': 'failure'}, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, format=None):
@@ -113,5 +116,5 @@ class MesiboUser(APIView):
             group.save()
             return Response({'message': 'success'}, status=status.HTTP_200_OK)
         except Exception as e:
-            print('excpetion is ', e)
+            logger.error('Error in MesiboUser PUT is ',e)
             return Response({'message': 'failure'}, status=status.HTTP_400_BAD_REQUEST)

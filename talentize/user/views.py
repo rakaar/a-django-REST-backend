@@ -15,6 +15,7 @@ import requests
 import json
 import base64
 from datetime import datetime
+from logging import getLogger
 
 from .serializers import UserSerializer
 from .models import User
@@ -22,6 +23,7 @@ from user_profile.models import Profile
 from .utils import check_token, MESIBO_APP_ID, MESIBO_APPTOKEN
 from .utils import SECRET_KEY_FOR_JWT as SECRET_FOR_JWT
 
+logger = getLogger(__name__)
 
 class Signup(APIView):
     '''
@@ -51,7 +53,8 @@ class Signup(APIView):
                 html_message=html_message
             )
             return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
-        except:
+        except Exception as e:
+            logger.error('Error in SignUp POST is ',e)
             return Response({'message': 'invalid email'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -237,5 +240,6 @@ class AppleUserToProfile(APIView):
             token = jwt.encode({'email': user.email, 'random': str(
                 datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
             return Response({'message': 'success', 'token': token}, status=status.HTTP_200_OK)
-        except:
+        except Exception as e:
+            logger.error('Error in AppleUserToProfile POST is ',e)
             return Response({'message': 'Invalid user'}, status=status.HTTP_400_BAD_REQUEST)
