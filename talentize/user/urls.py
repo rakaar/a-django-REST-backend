@@ -8,5 +8,5 @@ urlpatterns = [
     path('google/', views.GoogleOAuth.as_view(), name='google'),
     path('apple/redirect/', views.AppleOAuth, name='apple-oauth'),
     path('apple/<str:sub>', views.AppleUserToProfile, name='apple-profile'),
-    path('group/recent', views.ReadBy.as_view(), name='recent')
+    path('group/recent/', views.ReadBy.as_view(), name='recent')
 ]
