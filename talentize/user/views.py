@@ -25,6 +25,7 @@ from .utils import SECRET_KEY_FOR_JWT as SECRET_FOR_JWT
 
 logger = getLogger(__name__)
 
+
 class Signup(APIView):
     '''
     Endpoint for signup
@@ -40,10 +41,12 @@ class Signup(APIView):
             return Response({'message': 'already exists'}, status=status.HTTP_400_BAD_REQUEST)
         encoded_url_verification_param = jwt.encode(
             request.data, SECRET_FOR_JWT, algorithm='HS256').decode()
-        verification_url = 'http://localhost:8000/user/verify/' + encoded_url_verification_param
-        html_message = render_to_string('email_verification.html', {'url_value':verification_url})
+        verification_url = 'http://localhost:8000/user/verify/' + \
+            encoded_url_verification_param
+        html_message = render_to_string('email_verification.html', {
+                                        'url_value': verification_url})
         plain_message = strip_tags(html_message)
-        subject='Verification for Talentize.ai'
+        subject = 'Verification for Talentize.ai'
         try:
             send_mail(
                 subject,
@@ -54,7 +57,7 @@ class Signup(APIView):
             )
             return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
         except Exception as e:
-            logger.error('Error in SignUp POST is ',e)
+            logger.error('Error in SignUp POST is ', e)
             return Response({'message': 'invalid email'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -104,7 +107,8 @@ class Verify(APIView):
             res = requests.post('https://api.mesibo.com/api.php', data=data)
             mesibo_uid = res.json()['user']['uid']
             mesibo_token = res.json()['user']['token']
-            serializer.save(password_hash=password_hash, mesibo_uid=mesibo_uid, mesibo_token=mesibo_token,profile=Profile())
+            serializer.save(password_hash=password_hash, mesibo_uid=mesibo_uid,
+                            mesibo_token=mesibo_token, profile=Profile())
             return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -241,5 +245,31 @@ class AppleUserToProfile(APIView):
                 datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
             return Response({'message': 'success', 'token': token}, status=status.HTTP_200_OK)
         except Exception as e:
-            logger.error('Error in AppleUserToProfile POST is ',e)
+            logger.error('Error in AppleUserToProfile POST is ', e)
             return Response({'message': 'Invalid user'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ReadBy(APIView):
+    '''
+    Endpoint to handle readby for messages in a group
+    '''
+
+    def get(self, request, format=None):
+        '''
+        function to return list of users seen/unseen info
+        '''
+        data = request.data
+        uid = data['uid']
+        gid = data['gid']
+        mid = data['mid']
+        try:
+            user = User.objects.get(email=uid)
+            for group in user.mesibo_details.groups:
+                if gid == group.gid:
+                    for message in last_seen_msgs:
+                        if mid == message.mid:
+                            flag, uids = message.flag, message.uni_ids
+            return Response({'flag': flag, 'uids': uids}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error('Error in ReadBy GET is ', e)
+            return Response({'message': 'not found'}, status=status.HTTP_400_BAD_REQUEST)
