@@ -19,6 +19,7 @@ from logging import getLogger
 
 from .serializers import UserSerializer
 from .models import User
+from chat.models import Group
 from user_profile.models import Profile
 from .utils import check_token, MESIBO_APP_ID, MESIBO_APPTOKEN
 from .utils import SECRET_KEY_FOR_JWT as SECRET_FOR_JWT
@@ -269,7 +270,20 @@ class ReadBy(APIView):
                     for message in last_seen_msgs:
                         if mid == message.mid:
                             flag, uids = message.flag, message.uni_ids
-            return Response({'flag': flag, 'uids': uids}, status=status.HTTP_200_OK)
+            u_names = []
+            if flag == 'read':
+                for a_uid in uids:
+                    a_user = User.objects.get(email=a_uid)
+                    u_names.append(a_user.name)
+            else:
+                members = Group.objects.get(gid).uni_ids
+                members_who_read = [
+                    member for member in members if member not in uids]
+                for a_uid in members_who_read:
+                    a_user = User.objects.get(email=a_uid)
+                    u_names.append(a_user.name)
+
+            return Response({'read_by': u_names}, status=status.HTTP_200_OK)
         except Exception as e:
             logger.error('Error in ReadBy GET is ', e)
             return Response({'message': 'not found'}, status=status.HTTP_400_BAD_REQUEST)

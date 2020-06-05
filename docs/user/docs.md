@@ -34,3 +34,17 @@ Responses
 - { "message": "success", "token": TOKEN, "status": 202 } if login successful
 - { "message": "invalid creds", "status": 401 } if mail and password do not match
 
+
+#### GET `/user/group/recent`
+Data to be sent in this format
+```
+{
+  "uid": "string@string.com",
+  "gid": integer,
+  "mid": integer
+}
+```
+On hitting the endpoint
+Response
+- { "read_by": ["string", "string", ], "status": 200 } if successful
+- { "message": "not found", "status": 400 } if something goes wrong
