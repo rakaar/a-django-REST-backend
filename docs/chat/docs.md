@@ -72,5 +72,6 @@ Data to be sent in this format
 ```
 Responses
 - { "message": "success", "status": 200} if complaint emailed successfully
-- { "message": "invalid email", "status": 400 } if either failed to find users with the given emails or failed to email the moderator
+- { "message": "invalid email", "status": 400 } if either failed to find users with the given emails
+- { "message": "failed to send mail", "status": 400 } if it fails to send mail due to SMTP or an unknown error
 - { "message": "invalid group", "status": 400 } if failed to find group with the given gid

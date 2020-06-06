@@ -153,7 +153,6 @@ class Complaint(APIView):
         now = datetime.datetime.now()
         plain_message = '{} [{}] was reported by {} [{}] in the group, {}, on {}'.format(
             on_user_name, on_user_email, by_user_name, by_user_email, group_name, now)
-        print("MESSAGE : ", plain_message)
         try:
             send_mail(
                 'User Complaint',
@@ -164,4 +163,4 @@ class Complaint(APIView):
             return Response({'message': 'success'}, status=status.HTTP_200_OK)
         except Exception as e:
             logger.error('Error in Complaint POST is ', e)
-            return Response({'message': 'invalid email'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'failed to send mail'}, status=status.HTTP_400_BAD_REQUEST)
