@@ -18,12 +18,13 @@ from datetime import datetime
 from logging import getLogger
 
 from .serializers import UserSerializer
-from .models import User
+from .models import User, LastSeen
+from chat.models import Group, Mail
 from user_profile.models import Profile
 from .utils import check_token, MESIBO_APP_ID, MESIBO_APPTOKEN
 from .utils import SECRET_KEY_FOR_JWT as SECRET_FOR_JWT
-
 logger = getLogger(__name__)
+
 
 class Signup(APIView):
     '''
@@ -40,10 +41,12 @@ class Signup(APIView):
             return Response({'message': 'already exists'}, status=status.HTTP_400_BAD_REQUEST)
         encoded_url_verification_param = jwt.encode(
             request.data, SECRET_FOR_JWT, algorithm='HS256').decode()
-        verification_url = 'http://localhost:8000/user/verify/' + encoded_url_verification_param
-        html_message = render_to_string('email_verification.html', {'url_value':verification_url})
+        verification_url = 'http://localhost:8000/user/verify/' + \
+            encoded_url_verification_param
+        html_message = render_to_string('email_verification.html', {
+                                        'url_value': verification_url})
         plain_message = strip_tags(html_message)
-        subject='Verification for Talentize.ai'
+        subject = 'Verification for Talentize.ai'
         try:
             send_mail(
                 subject,
@@ -54,7 +57,7 @@ class Signup(APIView):
             )
             return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
         except Exception as e:
-            logger.error('Error in SignUp POST is ',e)
+            logger.error('Error in SignUp POST is ', e)
             return Response({'message': 'invalid email'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -104,7 +107,8 @@ class Verify(APIView):
             res = requests.post('https://api.mesibo.com/api.php', data=data)
             mesibo_uid = res.json()['user']['uid']
             mesibo_token = res.json()['user']['token']
-            serializer.save(password_hash=password_hash, mesibo_uid=mesibo_uid, mesibo_token=mesibo_token,profile=Profile())
+            serializer.save(password_hash=password_hash, mesibo_uid=mesibo_uid,
+                            mesibo_token=mesibo_token, profile=Profile())
             return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -241,5 +245,117 @@ class AppleUserToProfile(APIView):
                 datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
             return Response({'message': 'success', 'token': token}, status=status.HTTP_200_OK)
         except Exception as e:
-            logger.error('Error in AppleUserToProfile POST is ',e)
+            logger.error('Error in AppleUserToProfile POST is ', e)
             return Response({'message': 'Invalid user'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ReadBy(APIView):
+    '''
+    Endpoint to handle readby for messages in a group
+    '''
+
+    def get(self, request, format=None):
+        '''
+        function to return list of users seen/unseen info
+        '''
+        data = request.data
+        uid = data['uid']
+        gid = data['gid']
+        mid = data['mid']
+        try:
+            user = User.objects.get(email=uid)
+            for group in user.mesibo_details.groups:
+                if gid == group.gid:
+                    for message in group.last_seen_msgs:
+                        if mid == message.mid:
+                            flag, uids = message.flag, message.uni_ids
+            u_names = []
+            if flag == 'read':
+                for a_uid in uids:
+                    a_user = User.objects.get(email=a_uid.email)
+                    u_names.append(a_user.name)
+            else:
+                members = Group.objects.get(gid).uni_ids
+                members_who_read = [
+                    member.email for member in members if member not in uids]
+                for a_uid in members_who_read:
+                    a_user = User.objects.get(email=a_uid)
+                    u_names.append(a_user.name)
+
+            return Response({'read_by': u_names}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error('Error in ReadBy GET is ', e)
+            return Response({'message': 'not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+    def post(self, request, format=None):
+        '''
+        Endpoint to store people who read the last 5 messages of user
+        '''
+
+        uid = request.data['uid']
+        uid_reader = request.data['uid_reader']
+        gid = request.data['gid']
+        mid = request.data['mid']
+
+        try:
+            user = User.objects.get(email=uid)
+            user_group = [group for group in user.mesibo_details.groups if group.gid == gid][0]
+            mesibo_group = Group.objects.get(gid=gid)
+            max_num_readers = int(len(mesibo_group.uni_ids)/2)
+            last_seen_msg_ids = [msg.mid for msg in group.last_seen_msgs]
+            
+            # If a new message comes in
+            if mid not in last_seen_msg_ids:
+                if len(user_group.last_seen_msgs) == 5:
+                    user_group.last_seen_msgs.pop(0)
+                    user.save()
+                lastseen = LastSeen(mid=mid,flag='read',uni_ids=[Mail(email=uid_reader)])
+                user_group.last_seen_msgs.append(lastseen)
+                user.save()
+                return Response({'message': 'success'}, status=status.HTTP_200_OK)
+            
+            # For an already existing message 
+            last_seen_msg = [last_seen_msg for last_seen_msg in group.last_seen_msgs if last_seen_msg.mid == mid][0]
+            if last_seen_msg.flag == 'read':
+                if len(last_seen_msg.uni_ids) < max_num_readers:
+                    last_seen_msg.uni_ids.append(Mail(email=uid_reader))
+                    user.save()
+                    return Response({'message': 'success'}, status=status.HTTP_200_OK)
+                # If limit exceeds, flag becomes unread and contains all un_read users
+                else:
+                    last_seen_msg.flag = 'unread'
+                    all_emails = [email for uni_id.email in mesibo_group.uni_ids]
+                    readers = [uni_id.email for uni_id in user_group.last_seen_msgs.uni_ids]
+                    readers.append(uid_reader)
+                    un_read = [mail for mail in all_emails if mail not in readers]
+                    un_read_objs = [Mail(email=email) for email in un_read]
+                    last_seen_msg.uni_ids = un_read_objs
+                    user.save()
+                    return Response({'message': 'success'}, status=status.HTTP_200_OK)
+            
+            elif last_seen_msg.flag == 'unread':
+                # check if the user is in unread, because it might happen that user joined the group late
+                unread_emails = [uni_id.email for uni_id in last_seen_msg.uni_ids]
+                if uid_reader in unread_emails:
+                    index = [idx for idx,element in enumerate(last_seen_msg.uni_ids) if element.email==uid_reader][0]    
+                    last_seen_msgs.uni_ids.pop(index)
+                    return Response({ 'message': 'suceess'}, status=status.HTTP_200_OK)
+                else:
+                    return Response({ 'message': 'suceess'}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.error('Error in ReadBy POST is ', e)
+            return Response({'message': 'error'}, status=status.HTTP_400_BAD_REQUEST)    
+
+
+
+
+
+
+
+
+            
+
+
+            
