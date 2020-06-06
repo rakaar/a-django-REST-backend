@@ -318,7 +318,7 @@ class ReadBy(APIView):
             # For an already existing message 
             last_seen_msg = [last_seen_msg for last_seen_msg in group.last_seen_msgs if last_seen_msg.mid == mid][0]
             if last_seen_msg.flag == 'read':
-                if len(last_seen_msg.uni_ids) <= max_num_readers:
+                if len(last_seen_msg.uni_ids) < max_num_readers:
                     last_seen_msg.uni_ids.append(Mail(email=uid_reader))
                     user.save()
                     return Response({'message': 'success'}, status=status.HTTP_200_OK)
@@ -328,7 +328,7 @@ class ReadBy(APIView):
                     all_emails = [email for uni_id.email in mesibo_group.uni_ids]
                     readers = [uni_id.email for uni_id in user_group.last_seen_msgs.uni_ids]
                     readers.append(uid_reader)
-                    un_read = list(set(all_emails) - set(readers))
+                    un_read = [mail for mail in all_emails if mail not in readers]
                     un_read_objs = [Mail(email=email) for email in un_read]
                     last_seen_msg.uni_ids = un_read_objs
                     user.save()
