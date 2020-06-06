@@ -1,10 +1,12 @@
 from django.shortcuts import render
+from django.core.mail import send_mail
 
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
 import requests
+import datetime
 from logging import getLogger
 
 from user.utils import MESIBO_APPTOKEN, MESIBO_APP_ID
@@ -12,6 +14,7 @@ from .models import Group, Mail
 from user.models import User
 
 logger = getLogger(__name__)
+
 
 class MesiboGroup(APIView):
     '''
@@ -48,7 +51,7 @@ class MesiboGroup(APIView):
             users = [x.email for x in group.uni_ids]
             return Response({'users': users}, status=status.HTTP_200_OK)
         except Exception as e:
-            logger.error('Error in MesiboGroup GET is ',e)
+            logger.error('Error in MesiboGroup GET is ', e)
             return Response({'message': 'not found'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -67,7 +70,7 @@ class MesiboUser(APIView):
             groups = [(x.gid, x.status) for x in user.mesibo_details.groups]
             return Response({'groups': groups}, status=status.HTTP_200_OK)
         except Exception as e:
-            logger.error('Error in MesiboUser GET is ',e)
+            logger.error('Error in MesiboUser GET is ', e)
             return Response({'message': 'not found'}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, format=None):
@@ -90,7 +93,7 @@ class MesiboUser(APIView):
             group.save()
             return Response({'message': 'success'}, status=status.HTTP_200_OK)
         except Exception as e:
-            logger.error('Error in MesiboUser POST is ',e)
+            logger.error('Error in MesiboUser POST is ', e)
             return Response({'message': 'failure'}, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, format=None):
@@ -116,5 +119,48 @@ class MesiboUser(APIView):
             group.save()
             return Response({'message': 'success'}, status=status.HTTP_200_OK)
         except Exception as e:
-            logger.error('Error in MesiboUser PUT is ',e)
+            logger.error('Error in MesiboUser PUT is ', e)
             return Response({'message': 'failure'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class Complaint(APIView):
+    '''
+    Endpoint to email complaints from users to moderators
+    '''
+
+    def post(self, request, format=None):
+        '''
+        Endpoint to handle POST request 
+            of user complaints in group chats
+        '''
+
+        data = request.data
+        by_user_email = data['complaint_by']
+        on_user_email = data['complaint_on']
+        try:
+            by_user_name = User.objects.get(email=by_user_email).name
+            on_user_name = User.objects.get(email=on_user_email).name
+        except Exception as e:
+            logger.error('Error in Complaint POST is ', e)
+            return Response({'message': 'invalid email'}, status=status.HTTP_400_BAD_REQUEST)
+        gid = data['gid']
+        try:
+            group = Group.objects.get(gid=gid)
+        except Exception as e:
+            logger.error('Error in Complaint POST is ', e)
+            return Response({'message': 'invalid group'}, status=status.HTTP_400_BAD_REQUEST)
+        group_name = group.name
+        now = datetime.datetime.now()
+        plain_message = '{} [{}] was reported by {} [{}] in the group, {}, on {}'.format(
+            on_user_name, on_user_email, by_user_name, by_user_email, group_name, now)
+        try:
+            send_mail(
+                'User Complaint',
+                plain_message,
+                'llr.hall.complaints@gmail.com',
+                ['pankaj08072000@gmail.com'],  # Moderator Email
+            )
+            return Response({'message': 'success'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error('Error in Complaint POST is ', e)
+            return Response({'message': 'failed to send mail'}, status=status.HTTP_400_BAD_REQUEST)
