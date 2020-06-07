@@ -75,3 +75,16 @@ Responses
 - { "message": "invalid email", "status": 400 } if either failed to find users with the given emails
 - { "message": "failed to send mail", "status": 400 } if it fails to send mail due to SMTP or an unknown error
 - { "message": "invalid group", "status": 400 } if failed to find group with the given gid
+
+#### POST  `/chat/refer`
+Data to be sent in this format
+```
+{
+  "refered_msg": integer,
+  "refered_by": integer,
+  "gid": integer
+}
+```
+Responses
+- { "message": "success", "status": 200} if reference recorded successfully
+- { "message": "failure", "status": 500 } if request failed due to unknown reason

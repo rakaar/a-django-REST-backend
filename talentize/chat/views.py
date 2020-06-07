@@ -198,7 +198,6 @@ class ReferMsg(APIView):
         gid = data['gid']
         refered_msg = data['refered_msg']
         refered_by = data['refered_by']
-        # reference = MsgRefer(refer_to=refer_to, )
         try:
             group = Group.objects.get(gid=gid)
         except Exception as e:
@@ -220,5 +219,6 @@ class ReferMsg(APIView):
 
             group.msg_refers.append(MsgRefer(refer_to=refered_msg, refer_by=[
                                     MsgReferBy(refer_by=refered_by)]))
+            group.save()
             return Response({'message': 'success'}, status=status.HTTP_200_OK)
         return Response({'message': 'failure'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
