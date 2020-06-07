@@ -88,3 +88,15 @@ Data to be sent in this format
 Responses
 - { "message": "success", "status": 200} if reference recorded successfully
 - { "message": "failure", "status": 500 } if request failed due to unknown reason
+
+#### GET `/chat/refer`
+Returns all  groups of the user
+GET request to be sent with this body
+```
+{
+    "gid": integer
+}
+```
+Response
+- { "data": [ {integer: ["string"]} ] } if fetch is succcessful
+- { "message" : "invalid gid" } if wrong gid is sent
