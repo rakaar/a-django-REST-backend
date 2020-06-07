@@ -221,4 +221,4 @@ class ReferMsg(APIView):
             group.msg_refers.append(MsgRefer(refer_to=refered_msg, refer_by=[
                                     MsgReferBy(refer_by=refered_by)]))
             return Response({'message': 'success'}, status=status.HTTP_200_OK)
-        return Response({'message': 'failure'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        return Response({'message': 'failure'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
