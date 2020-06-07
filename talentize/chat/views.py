@@ -206,7 +206,7 @@ class ReferMsg(APIView):
             return Response({'message': 'invalid gid'}, status=status.HTTP_400_BAD_REQUEST)
 
         if group.msg_refers is None:
-            group.msg_refers = [MsgRefer(refer_to=refered_msg, refered_by=[
+            group.msg_refers = [MsgRefer(refer_to=refered_msg, refer_by=[
                                          MsgReferBy(refer_by=refered_by)])]
             group.save()
             return Response({'message': 'success'}, status=status.HTTP_200_OK)
@@ -218,7 +218,7 @@ class ReferMsg(APIView):
                     group.save()
                     return Response({'message': 'success'}, status=status.HTTP_200_OK)
 
-            group.msg_refers.append(MsgRefer(refer_to=refered_msg, refered_by=[
+            group.msg_refers.append(MsgRefer(refer_to=refered_msg, refer_by=[
                                     MsgReferBy(refer_by=refered_by)]))
             return Response({'message': 'success'}, status=status.HTTP_200_OK)
         return Response({'message': 'failure'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
