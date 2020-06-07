@@ -164,3 +164,25 @@ class Complaint(APIView):
         except Exception as e:
             logger.error('Error in Complaint POST is ', e)
             return Response({'message': 'failed to send mail'}, status=status.HTTP_400_BAD_REQUEST)
+
+class ReferMsg(APIView):
+    '''
+    Endpoints to get all the message referals of a group
+    '''
+
+    def get(self, request, format=None):
+        '''
+        Endpoint to get refered messages in a group chat
+        '''
+        gid = request.data['gid']
+        try:
+            group = Group.objects.get(gid=gid)
+            refer_msgs_data = []
+            for refer in group.msg_refers:
+                refer_dict = {}
+                refer_dict[refer.refer_to] = [x.refer_by for x in refer.refer_by]
+                refer_msgs_data.append(refer_dict)
+            return Response({'data': refer_msgs_data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error('Error in ReferMsg GET is ',e)
+            return Response({'message': 'invalid gid'},status=status.HTTP_400_BAD_REQUEST)
