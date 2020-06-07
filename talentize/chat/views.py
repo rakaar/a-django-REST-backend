@@ -10,7 +10,7 @@ import datetime
 from logging import getLogger
 
 from user.utils import MESIBO_APPTOKEN, MESIBO_APP_ID
-from .models import Group, Mail
+from .models import Group, Mail, MsgRefer, MsgReferBy
 from user.models import User
 
 logger = getLogger(__name__)
@@ -165,6 +165,7 @@ class Complaint(APIView):
             logger.error('Error in Complaint POST is ', e)
             return Response({'message': 'failed to send mail'}, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ReferMsg(APIView):
     '''
     Endpoints to get all the message referals of a group
@@ -180,9 +181,44 @@ class ReferMsg(APIView):
             refer_msgs_data = []
             for refer in group.msg_refers:
                 refer_dict = {}
-                refer_dict[refer.refer_to] = [x.refer_by for x in refer.refer_by]
+                refer_dict[refer.refer_to] = [
+                    x.refer_by for x in refer.refer_by]
                 refer_msgs_data.append(refer_dict)
             return Response({'data': refer_msgs_data}, status=status.HTTP_200_OK)
         except Exception as e:
-            logger.error('Error in ReferMsg GET is ',e)
-            return Response({'message': 'invalid gid'},status=status.HTTP_400_BAD_REQUEST)
+            logger.error('Error in ReferMsg GET is ', e)
+            return Response({'message': 'invalid gid'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request, format=None):
+        '''
+        Endpoint to store message references to another
+                in the group chat
+        '''
+        data = request.data
+        gid = data['gid']
+        refered_msg = data['refered_msg']
+        refered_by = data['refered_by']
+        try:
+            group = Group.objects.get(gid=gid)
+        except Exception as e:
+            logger.error('Error in ReferMsg POST is ', e)
+            return Response({'message': 'invalid gid'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if group.msg_refers is None:
+            group.msg_refers = [MsgRefer(refer_to=refered_msg, refer_by=[
+                                         MsgReferBy(refer_by=refered_by)])]
+            group.save()
+            return Response({'message': 'success'}, status=status.HTTP_200_OK)
+        else:
+            for ref_ind in range(len(group.msg_refers)):
+                if group.msg_refers[ref_ind].refer_to == refered_msg:
+                    group.msg_refers[ref_ind].refer_by.append(
+                        MsgReferBy(refer_by=refered_by))
+                    group.save()
+                    return Response({'message': 'success'}, status=status.HTTP_200_OK)
+
+            group.msg_refers.append(MsgRefer(refer_to=refered_msg, refer_by=[
+                                    MsgReferBy(refer_by=refered_by)]))
+            group.save()
+            return Response({'message': 'success'}, status=status.HTTP_200_OK)
+        return Response({'message': 'failure'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
