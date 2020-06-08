@@ -75,3 +75,16 @@ Responses
 - { "message": "invalid email", "status": 400 } if either failed to find users with the given emails
 - { "message": "failed to send mail", "status": 400 } if it fails to send mail due to SMTP or an unknown error
 - { "message": "invalid group", "status": 400 } if failed to find group with the given gid
+
+
+#### GET `/chat/refer`
+Returns all  groups of the user
+GET request to be sent with this body
+```
+{
+    "gid": integer
+}
+```
+Response
+- { "data": [ {integer: ["string"]} ] } if fetch is succcessful
+- { "message" : "invalid gid" } if wrong gid is sent
