@@ -76,6 +76,7 @@ Responses
 - { "message": "failed to send mail", "status": 400 } if it fails to send mail due to SMTP or an unknown error
 - { "message": "invalid group", "status": 400 } if failed to find group with the given gid
 
+<<<<<<< HEAD
 #### POST  `/chat/refer`
 Data to be sent in this format
 ```
@@ -88,6 +89,8 @@ Data to be sent in this format
 Responses
 - { "message": "success", "status": 200} if reference recorded successfully
 - { "message": "failure", "status": 500 } if request failed due to unknown reason
+=======
+>>>>>>> Added deployment stuff
 
 #### GET `/chat/refer`
 Returns all  groups of the user
@@ -100,3 +103,4 @@ GET request to be sent with this body
 Response
 - { "data": [ {integer: ["string"]} ] } if fetch is succcessful
 - { "message" : "invalid gid" } if wrong gid is sent
+
