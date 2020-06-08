@@ -77,6 +77,7 @@ Responses
 - { "message": "invalid group", "status": 400 } if failed to find group with the given gid
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 #### POST  `/chat/refer`
 Data to be sent in this format
 ```
@@ -91,6 +92,8 @@ Responses
 - { "message": "failure", "status": 500 } if request failed due to unknown reason
 =======
 >>>>>>> Added deployment stuff
+=======
+>>>>>>> f4c7dff806fc50f1d6d19153d3e83b05e8750bc9
 
 #### GET `/chat/refer`
 Returns all  groups of the user
