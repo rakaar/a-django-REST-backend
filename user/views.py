@@ -189,10 +189,10 @@ class ResetPassword(APIView):
                     user.password_hash = new_password_hash
                     user.save()
                     return Response({'message': 'success'}, status=status.HTTP_200_OK)
-                return Response({'message': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-            return Response({'message': 'Incorrect password'}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response({'message': 'invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'incorrect password'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
-            return Response({'message': 'Invalid activity'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'invalid activity'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GoogleOAuth(APIView):
