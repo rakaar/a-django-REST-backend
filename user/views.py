@@ -21,7 +21,7 @@ from .serializers import UserSerializer
 from .models import User, LastSeen
 from chat.models import Group, Mail
 from user_profile.models import Profile
-from .utils import check_token, MESIBO_APP_ID, MESIBO_APPTOKEN
+from .utils import check_token, is_token_valid, MESIBO_APP_ID, MESIBO_APPTOKEN
 from .utils import SECRET_KEY_FOR_JWT as SECRET_FOR_JWT
 logger = getLogger(__name__)
 
@@ -113,7 +113,55 @@ class Verify(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class ForgotPassword(APIView):
+    '''
+    Endpoint for forget and reset password
+    '''
 
+    def post(self, request, format=None):
+        '''
+        function to handle POST request to update password
+        '''
+        email = request.data['email']
+        if activity == "forgot":
+            try:
+                user = User.query.get(email=email)
+            except Exception as e:
+                logger.error('Not found user: ',email,' err: ',e)
+                return Response({ 'message': 'not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                token = jwt.encode({'email': email, 'random': str(
+                    datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
+                send_mail(
+                    'Password Reset for Talentize',
+                    'Here is a URL - Frotnend.com/forget/'+ token,
+                    'llr.hall.complaints@gmail.com',
+                    [request.data['email']],
+                    html_message=html_message
+                )
+                return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                logger.error('Error in SignUp POST is ', e)
+                return Response({'message': 'invalid email'}, status=status.HTTP_400_BAD_REQUEST)
+
+        elif activity == "update":
+            token = request.data['token']
+            email = jwt.decode(token, SECRET_KEY_FOR_JWT, algorithms=['HS256'])['email']
+            new_password = request.data['password']
+            if not is_token_valid(token):
+                return Response({ 'message': 'token expired'}, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                user = User.query.get(email=email)
+                user.password_hash = sha256(new_password.encode()).hexdigest()
+                user.save()
+                return Response({ 'message': 'success' }, status=status.HTTP_200_OK)
+            except Exception as e:
+                logger.error('Error in forget password is ',e)
+                return Response({'message': 'failure'},status=status.HTTP_400_BAD_REQUEST)
+
+
+    
 class GoogleOAuth(APIView):
     '''
     Endpoint to send authorization code from Google OAuth via client

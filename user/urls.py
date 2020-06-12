@@ -5,6 +5,7 @@ urlpatterns = [
     path('signup/', views.Signup.as_view(), name='signup'),
     path('login/', views.Login.as_view(), name='login'),
     path('verify/<str:hashed_code>/', views.Verify.as_view(), name='verify'),
+    path('forgot/', views.ForgotPassword.as_view(), name='forgot_password')
     path('google/', views.GoogleOAuth.as_view(), name='google'),
     path('apple/redirect/', views.AppleOAuth, name='apple-oauth'),
     path('apple/<str:sub>', views.AppleUserToProfile, name='apple-profile'),
