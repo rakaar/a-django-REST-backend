@@ -178,7 +178,7 @@ class ResetPassword(APIView):
                     datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
                 return Response({'message': 'success'}, status=status.HTTP_200_OK)
             else:
-                return Response({'message': 'invalid email or token'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'invalid token'}, status=status.HTTP_400_BAD_REQUEST)
         elif data['activity'] == 'update':
             password_hash = sha256(data['password'].encode()).hexdigest()
             user = User.objects.get(email=data['email'])
