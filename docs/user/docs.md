@@ -82,3 +82,22 @@ Response
 - { "message": "invalid email", "status": 400 } if wrong email
 - { "message": "token expired", "status": 400 } if token expired
 - { "message": "failure", "status": 400 } if failed to update password
+
+#### POST `/user/reset`
+Data to be sent in this format
+```
+{
+  "email": "string - string@string.com",
+  "password": "string - empty or password",
+  "activity": "token or update",
+  "token": "string - token",
+  "new_password": "sring - empty or new password"
+}
+```
+On hitting the endpoint
+Response
+- { "message": "success", "status": 200 } if successful
+- { "message": "invalid email or token", "status": 400 } if token is invalid for the given email - for activity = "token"
+- { "message": "Incorrect password", "status": 401 } if wrong password - for activity = "update"
+- { "message": "Invalid token", "status": 400 } if token expired/invalid - for activity = "update"
+- { "message": "Invalid activity", "status": 400 } if activity is neither "update" nor "token"

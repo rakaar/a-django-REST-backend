@@ -75,7 +75,6 @@ class Login(APIView):
         user = User.objects.filter(email=email, password_hash=password_hash)
         if not len(user):
             return Response({'message': 'invalid creds'}, status=status.HTTP_401_UNAUTHORIZED)
-        # change later with actually random string or with SECRET_FOR_JWT
         token = jwt.encode({'email': email, 'random': str(
             datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
         return Response({'token': token, 'message': 'success'}, status=status.HTTP_202_ACCEPTED)
@@ -113,29 +112,30 @@ class Verify(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ForgotPassword(APIView):
     '''
-    Endpoint for forget and reset password
+    Endpoint for forget password
     '''
 
     def post(self, request, format=None):
         '''
-        function to handle POST request to update password
+        function to handle POST request to set new password
         '''
         email = request.data['email']
         if activity == "forgot":
             try:
-                user = User.query.get(email=email)
+                user = User.objects.get(email=email)
             except Exception as e:
-                logger.error('Not found user: ',email,' err: ',e)
-                return Response({ 'message': 'not found'}, status=status.HTTP_400_BAD_REQUEST)
+                logger.error('Not found user: ', email, ' err: ', e)
+                return Response({'message': 'not found'}, status=status.HTTP_400_BAD_REQUEST)
 
             try:
                 token = jwt.encode({'email': email, 'random': str(
                     datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
                 send_mail(
                     'Password Reset for Talentize',
-                    'Here is a URL - Frotnend.com/forget/'+ token,
+                    'Here is a URL - Frotnend.com/forget/' + token,
                     'llr.hall.complaints@gmail.com',
                     [request.data['email']],
                     html_message=html_message
@@ -147,21 +147,54 @@ class ForgotPassword(APIView):
 
         elif activity == "update":
             token = request.data['token']
-            email = jwt.decode(token, SECRET_KEY_FOR_JWT, algorithms=['HS256'])['email']
+            email = jwt.decode(token, SECRET_KEY_FOR_JWT,
+                               algorithms=['HS256'])['email']
             new_password = request.data['password']
             if not is_token_valid(token):
-                return Response({ 'message': 'token expired'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'token expired'}, status=status.HTTP_400_BAD_REQUEST)
             try:
-                user = User.query.get(email=email)
+                user = User.objects.get(email=email)
                 user.password_hash = sha256(new_password.encode()).hexdigest()
                 user.save()
-                return Response({ 'message': 'success' }, status=status.HTTP_200_OK)
+                return Response({'message': 'success'}, status=status.HTTP_200_OK)
             except Exception as e:
-                logger.error('Error in forget password is ',e)
-                return Response({'message': 'failure'},status=status.HTTP_400_BAD_REQUEST)
+                logger.error('Error in forget password is ', e)
+                return Response({'message': 'failure'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-    
+class ResetPassword(APIView):
+    '''
+    Endpoint to reset a user's password
+    '''
+
+    def post(self, request, format=None):
+        '''
+        function to handle POST request to update password
+        '''
+        data = request.data
+        if data['activity'] == 'token':
+            if check_token(data['email'], data['token']):
+                token = jwt.encode({'email': data['email'], 'random': str(
+                    datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
+                return Response({'message': 'success'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'message': 'invalid email or token'}, status=status.HTTP_400_BAD_REQUEST)
+        elif data['activity'] == 'update':
+            password_hash = sha256(data['password'].encode()).hexdigest()
+            user = User.objects.get(email=data['email'])
+            if user.password_hash == password_hash:
+                if is_token_valid(data['token']):
+                    new_password_hash = sha256(
+                        data['new_password'].encode()).hexdigest()
+                    user.password_hash = new_password_hash
+                    user.save()
+                    return Response({'message': 'success'}, status=status.HTTP_200_OK)
+                return Response({'message': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Incorrect password'}, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            return Response({'message': 'Invalid activity'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 class GoogleOAuth(APIView):
     '''
     Endpoint to send authorization code from Google OAuth via client
@@ -335,7 +368,6 @@ class ReadBy(APIView):
             logger.error('Error in ReadBy GET is ', e)
             return Response({'message': 'not found'}, status=status.HTTP_400_BAD_REQUEST)
 
-
     def post(self, request, format=None):
         '''
         Endpoint to store people who read the last 5 messages of user
@@ -348,23 +380,26 @@ class ReadBy(APIView):
 
         try:
             user = User.objects.get(email=uid)
-            user_group = [group for group in user.mesibo_details.groups if group.gid == gid][0]
+            user_group = [
+                group for group in user.mesibo_details.groups if group.gid == gid][0]
             mesibo_group = Group.objects.get(gid=gid)
             max_num_readers = int(len(mesibo_group.uni_ids)/2)
             last_seen_msg_ids = [msg.mid for msg in group.last_seen_msgs]
-            
+
             # If a new message comes in
             if mid not in last_seen_msg_ids:
                 if len(user_group.last_seen_msgs) == 5:
                     user_group.last_seen_msgs.pop(0)
                     user.save()
-                lastseen = LastSeen(mid=mid,flag='read',uni_ids=[Mail(email=uid_reader)])
+                lastseen = LastSeen(mid=mid, flag='read', uni_ids=[
+                                    Mail(email=uid_reader)])
                 user_group.last_seen_msgs.append(lastseen)
                 user.save()
                 return Response({'message': 'success'}, status=status.HTTP_200_OK)
-            
-            # For an already existing message 
-            last_seen_msg = [last_seen_msg for last_seen_msg in group.last_seen_msgs if last_seen_msg.mid == mid][0]
+
+            # For an already existing message
+            last_seen_msg = [
+                last_seen_msg for last_seen_msg in group.last_seen_msgs if last_seen_msg.mid == mid][0]
             if last_seen_msg.flag == 'read':
                 if len(last_seen_msg.uni_ids) < max_num_readers:
                     last_seen_msg.uni_ids.append(Mail(email=uid_reader))
@@ -373,37 +408,30 @@ class ReadBy(APIView):
                 # If limit exceeds, flag becomes unread and contains all un_read users
                 else:
                     last_seen_msg.flag = 'unread'
-                    all_emails = [email for uni_id.email in mesibo_group.uni_ids]
-                    readers = [uni_id.email for uni_id in user_group.last_seen_msgs.uni_ids]
+                    all_emails = [
+                        email for uni_id.email in mesibo_group.uni_ids]
+                    readers = [
+                        uni_id.email for uni_id in user_group.last_seen_msgs.uni_ids]
                     readers.append(uid_reader)
-                    un_read = [mail for mail in all_emails if mail not in readers]
+                    un_read = [
+                        mail for mail in all_emails if mail not in readers]
                     un_read_objs = [Mail(email=email) for email in un_read]
                     last_seen_msg.uni_ids = un_read_objs
                     user.save()
                     return Response({'message': 'success'}, status=status.HTTP_200_OK)
-            
+
             elif last_seen_msg.flag == 'unread':
                 # check if the user is in unread, because it might happen that user joined the group late
-                unread_emails = [uni_id.email for uni_id in last_seen_msg.uni_ids]
+                unread_emails = [
+                    uni_id.email for uni_id in last_seen_msg.uni_ids]
                 if uid_reader in unread_emails:
-                    index = [idx for idx,element in enumerate(last_seen_msg.uni_ids) if element.email==uid_reader][0]    
+                    index = [idx for idx, element in enumerate(
+                        last_seen_msg.uni_ids) if element.email == uid_reader][0]
                     last_seen_msgs.uni_ids.pop(index)
-                    return Response({ 'message': 'suceess'}, status=status.HTTP_200_OK)
+                    return Response({'message': 'suceess'}, status=status.HTTP_200_OK)
                 else:
-                    return Response({ 'message': 'suceess'}, status=status.HTTP_200_OK)
+                    return Response({'message': 'suceess'}, status=status.HTTP_200_OK)
 
         except Exception as e:
             logger.error('Error in ReadBy POST is ', e)
-            return Response({'message': 'error'}, status=status.HTTP_400_BAD_REQUEST)    
-
-
-
-
-
-
-
-
-            
-
-
-            
+            return Response({'message': 'error'}, status=status.HTTP_400_BAD_REQUEST)
