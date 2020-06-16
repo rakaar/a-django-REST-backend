@@ -12,7 +12,7 @@ Data to be sent in this format
 ```
 Responses
 - { "message": "success", "status": 201 } if able to send verification mail
-- { "message": "already exists", "status": 400 } if user is registering with an already existing mail
+- { "message": "already exists", "status": 409 } if user is registering with an already existing mail
 - { "message": "invalid mail", "status": 400 } if unable to send mail due to wrong email providied
 
 

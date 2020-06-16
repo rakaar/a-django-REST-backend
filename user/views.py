@@ -38,7 +38,7 @@ class Signup(APIView):
         '''
         already_exists = User.objects.filter(email=request.data['email'])
         if already_exists:
-            return Response({'message': 'already exists'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'already exists'}, status=status.HTTP_409_CONFLICT)
         encoded_url_verification_param = jwt.encode(
             request.data, SECRET_FOR_JWT, algorithm='HS256').decode()
         verification_url = 'http://localhost:8000/user/verify/' + \
