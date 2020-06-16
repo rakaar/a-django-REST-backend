@@ -1,5 +1,5 @@
 import jwt
-from datetime import dateime
+from datetime import datetime
 SECRET_KEY_FOR_JWT = 'SECRET_KEY'
 
 MESIBO_APP_ID = "8117"
