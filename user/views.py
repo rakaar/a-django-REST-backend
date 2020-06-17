@@ -18,7 +18,7 @@ from datetime import datetime
 from logging import getLogger
 
 from .serializers import UserSerializer
-from .models import User, LastSeen
+from .models import User, LastSeen, MesiboUser
 from chat.models import Group, Mail
 from user_profile.models import Profile
 from .utils import check_token, is_token_valid, MESIBO_APP_ID, MESIBO_APPTOKEN
@@ -41,7 +41,7 @@ class Signup(APIView):
             return Response({'message': 'already exists'}, status=status.HTTP_409_CONFLICT)
         encoded_url_verification_param = jwt.encode(
             request.data, SECRET_FOR_JWT, algorithm='HS256').decode()
-        verification_url = 'http://localhost:8000/user/verify/' + \
+        verification_url = 'http://localhost:3000/user/verify/' + \
             encoded_url_verification_param
         html_message = render_to_string('email_verification.html', {
                                         'url_value': verification_url})
@@ -70,6 +70,7 @@ class Login(APIView):
         '''
         function to handle login request
         '''
+        print('LOGIN DATA :', request.data)
         password_hash = sha256(request.data['password'].encode()).hexdigest()
         email = request.data['email']
         user = User.objects.filter(email=email, password_hash=password_hash)
@@ -90,10 +91,9 @@ class Verify(APIView):
         function to handle GET request 
             verifies email and stores user in DB
         '''
-        user_data = jwt.decode(hashed_code.encode(),
-                               SECRET_FOR_JWT, algorithms=['HS256'])
-        serializer = UserSerializer(data=user_data)
-        if serializer.is_valid():
+        try:
+            user_data = jwt.decode(hashed_code.encode(),
+                                SECRET_FOR_JWT, algorithms=['HS256'])
             original_password = user_data['password_hash']
             password_hash = sha256(original_password.encode()).hexdigest()
             # Obtain mesibo access token
@@ -103,14 +103,24 @@ class Verify(APIView):
                 "addr": user_data['email'],
                 "appid": MESIBO_APP_ID
             }
+        except Exception as e:
+            logger.error('Error in Verify GET is ', e)
+            return Response({'message':'data error'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
             res = requests.post('https://api.mesibo.com/api.php', data=data)
-            mesibo_uid = res.json()['user']['uid']
-            mesibo_token = res.json()['user']['token']
-            serializer.save(password_hash=password_hash, mesibo_uid=mesibo_uid,
-                            mesibo_token=mesibo_token, profile=Profile())
+        except Exception as e:
+            logger.error('Error in Verify GET is ', e)
+            return Response({'message':'mesibo failure'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        mesibo_uid = res.json()['user']['uid']
+        mesibo_token = res.json()['user']['token']
+        try:
+            user = User(name=user_data['name'],email=user_data['email'], password_hash=user_data['password_hash'], insti_email=user_data['insti_email'], mesibo_details=MesiboUser(uid=mesibo_uid,
+                            access_token=mesibo_token), profile=Profile())
+            user.save()
             return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.error('Error in Verify GET is ', e)
+            return Response({'message':'db failure'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ForgotPassword(APIView):
