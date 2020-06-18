@@ -70,7 +70,6 @@ class Login(APIView):
         '''
         function to handle login request
         '''
-        print('LOGIN DATA :', request.data)
         password_hash = sha256(request.data['password'].encode()).hexdigest()
         email = request.data['email']
         user = User.objects.filter(email=email, password_hash=password_hash)
