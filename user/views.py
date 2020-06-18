@@ -78,7 +78,7 @@ class Login(APIView):
             return Response({'message': 'invalid creds'}, status=status.HTTP_401_UNAUTHORIZED)
         token = jwt.encode({'email': email, 'random': str(
             datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
-        return Response({'token': token, 'message': 'success'}, status=status.HTTP_202_ACCEPTED)
+        return Response({'token': token, 'message': 'success'}, status=status.HTTP_200_OK)
 
 
 class Verify(APIView):
@@ -114,7 +114,7 @@ class Verify(APIView):
         mesibo_uid = res.json()['user']['uid']
         mesibo_token = res.json()['user']['token']
         try:
-            user = User(name=user_data['name'],email=user_data['email'], password_hash=user_data['password_hash'], insti_email=user_data['insti_email'], mesibo_details=MesiboUser(uid=mesibo_uid,
+            user = User(name=user_data['name'],email=user_data['email'], password_hash=password_hash, insti_email=user_data['insti_email'], mesibo_details=MesiboUser(uid=mesibo_uid,
                             access_token=mesibo_token), profile=Profile())
             user.save()
             return Response({'message': 'success'}, status=status.HTTP_201_CREATED)

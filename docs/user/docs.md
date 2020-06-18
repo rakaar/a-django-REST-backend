@@ -1,6 +1,6 @@
 # Documentation of endpoints related to authentication
 
-#### POST  `/user/signup`
+#### POST  `/user/signup/`
 Data to be sent in this format
 ```
 {
@@ -16,13 +16,13 @@ Responses
 - { "message": "invalid mail", "status": 400 } if unable to send mail due to wrong email providied
 
 
-#### GET `/user/verify/<hashed_code>`
+#### GET `/user/verify/<hashed_code>/`
 On hitting the link in the browser
 Responses
 - { "message": "success", "status": 201 } if successfully saved in databased
 - { "message": ERRORS, "status": 400 } if wrong URL is hit
 
-#### POST `/user/login`
+#### POST `/user/login/`
 Data to be sent in this format
 ```
 {
@@ -31,11 +31,11 @@ Data to be sent in this format
 }
 ```
 Responses
-- { "message": "success", "token": TOKEN, "status": 202 } if login successful
+- { "message": "success", "token": TOKEN, "status": 200 } if login successful
 - { "message": "invalid creds", "status": 401 } if mail and password do not match
 
 
-#### GET `/user/group/recent`
+#### GET `/user/group/recent/`
 Data to be sent in this format
 ```
 {
@@ -50,7 +50,7 @@ Response
 - { "message": "not found", "status": 400 } if something goes wrong
 
 
-#### POST `/user/group/recent`
+#### POST `/user/group/recent/`
 Data to be sent in this format
 ```
 {
@@ -65,7 +65,7 @@ Response
 - { "message": "success", "status": 200 } if successful
 - { "message": "error", "status": 400 } if something goes wrong
 
-#### POST `/user/forgot`
+#### POST `/user/forgot/`
 Data to be sent in this format
 ```
 {
@@ -83,7 +83,7 @@ Response
 - { "message": "token expired", "status": 400 } if token expired
 - { "message": "failure", "status": 400 } if failed to update password
 
-#### POST `/user/reset`
+#### POST `/user/reset/`
 Data to be sent in this format
 ```
 {

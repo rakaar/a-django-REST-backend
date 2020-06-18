@@ -1,6 +1,6 @@
 # Endpoints for Profile Updation
 
-#### GET `/profile` (To get the complete profile details of a user)
+#### GET `/profile/` (To get the complete profile details of a user)
 Data to be sent in this format
 ```
 {
@@ -13,7 +13,7 @@ Responses
 - { "message": "invalid token", "status": 400 } if token is invalid
 - { "message": "invalid user", "status": 401 } if user is not found in database
 
-#### POST `/profile/education` (To update education details in the profile)
+#### POST `/profile/education/` (To update education details in the profile)
 Data to be sent in this format
 ```
 {
@@ -95,7 +95,7 @@ Responses
 - { "message": "invalid token", "status": 400 } if token is not right
 - { "message": "invalid user", "status": 401 } if user not found in Database
 
-#### POST `/profile/experience` (To update experience details in the profile)
+#### POST `/profile/experience/` (To update experience details in the profile)
 Data to be sent in this format
 ```
 {
@@ -167,7 +167,7 @@ Responses
 - { "message": "invalid token", "status": 400 } if token is not right
 - { "message": "invalid user", "status": 401 } if user not found in Database
 
-#### POST `profile/achs` (To update personal details in the profile)
+#### POST `profile/achs/` (To update personal details in the profile)
 Data to be sent in this format
 ```
 {
@@ -199,7 +199,7 @@ Responses
 - { "message": "invalid token", "status": 400 } if token is not right
 - { "message": "invalid user", "status": 401 } if user not found in Data
 
-#### POST `/profile/personal`
+#### POST `/profile/personal/`
 Data to be sent in this format
 ```
 {

@@ -1,6 +1,6 @@
 # Documentation of endpoints related to authentication
 
-#### POST  `/chat/group`
+#### POST  `/chat/group/`
 Data to be sent in this format
 ```
 {
@@ -13,7 +13,7 @@ Responses
 - { "message": "success", "gid": gid, "name": name } if group created successfully
 - { "message": "failure", "status": 400 } if failed to create groups
 
-#### GET `/chat/group`
+#### GET `/chat/group/`
 Returns all  email of users of the group
 GET request to be sent in this format
 ```
@@ -25,7 +25,7 @@ Response
 - { "users": ["string1@string1.com", "string2@string2.com" ]} if fetch is succcessful
 - { "message" : "not found" } if wrong group id is mentioned
 
-#### POST `/chat/user`
+#### POST `/chat/user/`
 Data to be sent in this format
 ```
 {
@@ -37,7 +37,7 @@ Responses
 - { "message": "success" } if user added to group successfully
 - { "message": "failure", "status": 400 } otherwise
 
-#### PUT `/chat/user`
+#### PUT `/chat/user/`
 Data to be sent in this format
 ```
 {
@@ -49,7 +49,7 @@ Responses
 - { "message": "success" } if user added to group successfully
 - { "message": "failure", "status": 400 } otherwise
 
-#### GET `/chat/user`
+#### GET `/chat/user/`
 Returns all  groups of the user
 GET request to be sent with this body
 ```
@@ -61,7 +61,7 @@ Response
 - { "groups": [[gid1, active_status_1], [integer, bool], [675, true]]} if fetch is succcessful
 - { "message" : "not found" } if wrong user email is recieved 
 
-#### POST  `/chat/complaint`
+#### POST  `/chat/complaint/`
 Data to be sent in this format
 ```
 {
@@ -76,9 +76,7 @@ Responses
 - { "message": "failed to send mail", "status": 400 } if it fails to send mail due to SMTP or an unknown error
 - { "message": "invalid group", "status": 400 } if failed to find group with the given gid
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#### POST  `/chat/refer`
+#### POST  `/chat/refer/`
 Data to be sent in this format
 ```
 {
@@ -90,12 +88,8 @@ Data to be sent in this format
 Responses
 - { "message": "success", "status": 200} if reference recorded successfully
 - { "message": "failure", "status": 500 } if request failed due to unknown reason
-=======
->>>>>>> Added deployment stuff
-=======
->>>>>>> f4c7dff806fc50f1d6d19153d3e83b05e8750bc9
 
-#### GET `/chat/refer`
+#### GET `/chat/refer/`
 Returns all  groups of the user
 GET request to be sent with this body
 ```
