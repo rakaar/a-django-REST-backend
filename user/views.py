@@ -41,8 +41,8 @@ class Signup(APIView):
             return Response({'message': 'already exists'}, status=status.HTTP_409_CONFLICT)
         encoded_url_verification_param = jwt.encode(
             request.data, SECRET_FOR_JWT, algorithm='HS256').decode()
-        encoded_url_verification_param = encoded_url_verification_param.replace('.', '9999')
-        verification_url = 'https://numouno.tech/verify/' + \
+        encoded_url_verification_param = encoded_url_verification_param.replace('.', '__')
+        verification_url = 'https://test-numouno.herokuapp.com/user/verify/' + \
             encoded_url_verification_param
         html_message = render_to_string('email_verification.html', {
                                         'url_value': verification_url})
@@ -92,7 +92,7 @@ class Verify(APIView):
             verifies email and stores user in DB
         '''
         try:
-            decoded_hashed_code = hashed_code.replace('9999', '.')
+            decoded_hashed_code = hashed_code.replace('__', '.')
             user_data = jwt.decode(decoded_hashed_code.encode(),
                                 SECRET_FOR_JWT, algorithms=['HS256'])
             original_password = user_data['password_hash']
