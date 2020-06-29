@@ -42,7 +42,7 @@ class Signup(APIView):
         encoded_url_verification_param = jwt.encode(
             request.data, SECRET_FOR_JWT, algorithm='HS256').decode()
         encoded_url_verification_param = encoded_url_verification_param.replace('.', '__')
-        verification_url = 'https://test-numouno.herokuapp.com/user/verify/' + \
+        verification_url = 'https://numouno.tech/verify/' + \
             encoded_url_verification_param
         html_message = render_to_string('email_verification.html', {
                                         'url_value': verification_url})
