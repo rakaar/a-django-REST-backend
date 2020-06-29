@@ -26,7 +26,7 @@ SECRET_KEY = 'hkbk-$mfsayergpivxp4u#$6%4d5@lgx_9twlascbyb#_y4*^$'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['api.numouno.tech', '54.160.101.208']
+ALLOWED_HOSTS = ['api.numouno.tech', '54.160.101.208', 'localhost']
 
 
 # Application definition
@@ -115,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
     'handlers': {
         'file': {
             'level': 'DEBUG',
@@ -160,10 +160,10 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 #Django MAIL
-EMAIL_HOST_USER  = 'llr.hall.complaints@gmail.com'
-EMAIL_HOST_PASSWORD = 'yollr123'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
+EMAIL_HOST_USER  = 'contact@numouno.tech'
+EMAIL_HOST_PASSWORD = 'Mrjaroemail1'
+EMAIL_HOST = 'smtp.numouno.tech'
+EMAIL_PORT =  587
 EMAIL_USE_TLS = True
-
+#EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
 
