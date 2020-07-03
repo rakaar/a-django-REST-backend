@@ -1,28 +1,4 @@
-#### Deployed at https://talentize-backend.herokuapp.com/
-
-### Directory Structure
-
-```
-- requirements.txt
-- talentize/
-    -manage.py
-    - user
-        - admin.py
-        - apps.py
-        - __init__.py
-        - migrations
-        - models.py
-        - tests.py
-        - views.py
-   -user_profile
-        - admin.py
-        - apps.py
-        - __init__.py
-        - migrations
-        - models.py
-        - tests.py
-        - views.py
-```
+#### Deployed at https://api.numouno.tech/
 
 ### Installation and setup
 - Create a virtual environment using venv
