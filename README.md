@@ -1,4 +1,4 @@
-#### Deployed at https://api.numouno.tech/
+#### Deployed @ https://api.numouno.tech/
 
 ### Installation and setup
 - Create a virtual environment using venv
