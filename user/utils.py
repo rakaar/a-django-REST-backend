@@ -19,7 +19,7 @@ def check_token(email, token):
     return decode_obj['email'] == email
 
 
-def is_token_valid(token):
+def is_token_valid(token, mins):
     '''
     Utility function to check if token is  expired or not
     Args:
@@ -39,7 +39,7 @@ def is_token_valid(token):
     
     time_difference = current_time - token_time
     time_difference_in_mins = time_difference.total_seconds()/60
-    return time_difference_in_mins < 10
+    return time_difference_in_mins < mins
 
 
 
