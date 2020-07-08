@@ -45,7 +45,7 @@ class Signup(APIView):
         verification_url = 'https://numouno.tech/verify/' + \
             encoded_url_verification_param
         html_message = render_to_string('email_verification.html', {
-                                        'url_value': verification_url})
+                                        'url_value': verification_url, 'name': request.data['name']})
         plain_message = strip_tags(html_message)
         subject = 'Verification for Talentize.ai'
         try:
