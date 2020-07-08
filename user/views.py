@@ -39,8 +39,10 @@ class Signup(APIView):
         already_exists = User.objects.filter(email=request.data['email'])
         if already_exists:
             return Response({'message': 'already exists'}, status=status.HTTP_409_CONFLICT)
+        data = request.data
+        data['random'] = str(datetime.now().timestamp())
         encoded_url_verification_param = jwt.encode(
-            request.data, SECRET_FOR_JWT, algorithm='HS256').decode()
+            data, SECRET_FOR_JWT, algorithm='HS256').decode()
         encoded_url_verification_param = encoded_url_verification_param.replace('.', '__')
         verification_url = 'https://numouno.tech/verify/' + \
             encoded_url_verification_param
@@ -93,6 +95,8 @@ class Verify(APIView):
         '''
         try:
             decoded_hashed_code = hashed_code.replace('__', '.')
+            if not is_token_valid(decoded_hashed_code, 1440):
+                return Response({'message': 'link expired'}, status=status.HTTP_410_GONE)
             user_data = jwt.decode(decoded_hashed_code.encode(),
                                 SECRET_FOR_JWT, algorithms=['HS256'])
             original_password = user_data['password_hash']
@@ -161,7 +165,7 @@ class ForgotPassword(APIView):
             email = jwt.decode(token, SECRET_KEY_FOR_JWT,
                                algorithms=['HS256'])['email']
             new_password = request.data['password']
-            if not is_token_valid(token):
+            if not is_token_valid(token, 10):
                 return Response({'message': 'token expired'}, status=status.HTTP_400_BAD_REQUEST)
             try:
                 user = User.objects.get(email=email)
@@ -194,7 +198,7 @@ class ResetPassword(APIView):
             password_hash = sha256(data['password'].encode()).hexdigest()
             user = User.objects.get(email=data['email'])
             if user.password_hash == password_hash:
-                if is_token_valid(data['token']):
+                if is_token_valid(data['token'], 10):
                     new_password_hash = sha256(
                         data['new_password'].encode()).hexdigest()
                     user.password_hash = new_password_hash
