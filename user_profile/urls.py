@@ -7,6 +7,7 @@ urlpatterns = [
     path('experience', views.Experience.as_view(), name='experience'),
     path('achs/', views.Achievement.as_view(), name='achs'),
     path('personal/', views.Personal.as_view(), name='personal'),
-    path('pic/', views.ProPic.as_view(), name='propic')
+    path('pic/', views.ProPic.as_view(), name='propic'),
+    path('podcast/', views.Podcast.as_view(), name='podcast')
 
 ]
