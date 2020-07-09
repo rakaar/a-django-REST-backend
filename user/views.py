@@ -233,9 +233,9 @@ class GoogleOAuth(APIView):
         r = requests.post(
             'https://oauth2.googleapis.com', params=payload
         )
-        resp = json.loads(r.text)
+        resp = (r.text)
         print('RESPONSE 1 : ', resp)
-        return Response(resp, status=status.HTTP_202_ACCEPTED)
+        return Response({'kuch_mat' : resp}, status=status.HTTP_202_ACCEPTED)
         # r = requests.get(
         #     'https://www.googleapis.com/oauth2/v2/userinfo', params=payload)
         # data = json.loads(r.text)
