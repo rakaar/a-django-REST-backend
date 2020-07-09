@@ -222,29 +222,42 @@ class GoogleOAuth(APIView):
         # Tasks left
         # Fetching authorization code from frontend
         # Using the above to send to Google  to get Access token
-        payload = {'access_token': request.data.get("token")}
-        r = requests.get(
-            'https://www.googleapis.com/oauth2/v2/userinfo', params=payload)
-        data = json.loads(r.text)
+        auth_code = request.data["code"]    
+        payload = {'code': auth_code,
+                    'client_id'='939204723287-lr57oipdf4ifpbor35p0i1jdrq8708jc.apps.googleusercontent.com',
+                    'client_secret'='JKcjiVojOIyHu6f0kyMS6mjx',
+                    'redirect_uri'= 'http%3A%2F%2Flocalhost%3A3000%2Fgoogle%2Foauth'
+                    'grant_type'='authorization_code'
+                }
+        
+        r = request.post(
+            'oauth2.googleapis.com', params=payload
+        )
+        resp = json.loads(r.text)
+        print('RESPONSE 1 : ', resp)
+        return Response(resp, status=status.HTTP_202_ACCEPTED)
+        # r = requests.get(
+        #     'https://www.googleapis.com/oauth2/v2/userinfo', params=payload)
+        # data = json.loads(r.text)
 
-        if 'error' in data:
-            return Response({'message': 'wrong or expired google token'}, status=status.HTTP_401_UNAUTHORIZED)
+        # if 'error' in data:
+        #     return Response({'message': 'wrong or expired google token'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        try:
-            user = User.objects.filter(email=data['email'])
-            message = 'success'
-        except User.DoesNotExist:
-            user = User()
-            user.name = data['name']
-            user.email = data['email']
-            user.password_hash = make_password(
-                BaseUserManager().make_random_password())
-            user.save()
-            message = 'new user'
+        # try:
+        #     user = User.objects.filter(email=data['email'])
+        #     message = 'success'
+        # except User.DoesNotExist:
+        #     user = User()
+        #     user.name = data['name']
+        #     user.email = data['email']
+        #     user.password_hash = make_password(
+        #         BaseUserManager().make_random_password())
+        #     user.save()
+        #     message = 'new user'
 
-        token = jwt.encode({'email': data['email'], 'random': str(
-            datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
-        return Response({'token': token, 'message': message, 'name': data['name'], 'email': data['email']}, status=status.HTTP_202_ACCEPTED)
+        # token = jwt.encode({'email': data['email'], 'random': str(
+        #     datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
+        # return Response({'token': token, 'message': message, 'name': data['name'], 'email': data['email']}, status=status.HTTP_202_ACCEPTED)
 
 
 class LinkedinOAuth(APIView):
