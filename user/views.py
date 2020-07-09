@@ -224,10 +224,10 @@ class GoogleOAuth(APIView):
         # Using the above to send to Google  to get Access token
         auth_code = request.data["code"]    
         payload = {'code': auth_code,
-                    'client_id'='939204723287-lr57oipdf4ifpbor35p0i1jdrq8708jc.apps.googleusercontent.com',
-                    'client_secret'='JKcjiVojOIyHu6f0kyMS6mjx',
-                    'redirect_uri'= 'http%3A%2F%2Flocalhost%3A3000%2Fgoogle%2Foauth'
-                    'grant_type'='authorization_code'
+                    'client_id':'939204723287-lr57oipdf4ifpbor35p0i1jdrq8708jc.apps.googleusercontent.com',
+                    'client_secret':'JKcjiVojOIyHu6f0kyMS6mjx',
+                    'redirect_uri':'http%3A%2F%2Flocalhost%3A3000%2Fgoogle%2Foauth'
+                    'grant_type':'authorization_code'
                 }
         
         r = request.post(
