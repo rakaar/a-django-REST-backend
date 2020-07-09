@@ -230,7 +230,7 @@ class GoogleOAuth(APIView):
                     'grant_type':'authorization_code'
                 }
         
-        r = request.post(
+        r = requests.post(
             'oauth2.googleapis.com', params=payload
         )
         resp = json.loads(r.text)
