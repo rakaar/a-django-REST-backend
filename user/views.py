@@ -44,7 +44,7 @@ class Signup(APIView):
         encoded_url_verification_param = jwt.encode(
             data, SECRET_FOR_JWT, algorithm='HS256').decode()
         encoded_url_verification_param = encoded_url_verification_param.replace('.', '__')
-        verification_url = 'https://numouno.tech/verify/' + \
+        verification_url = 'https://master.d1irig95qyvz8m.amplifyapp.com/verify/' + \
             encoded_url_verification_param
         html_message = render_to_string('email_verification.html', {
                                         'url_value': verification_url, 'name': request.data['name']})

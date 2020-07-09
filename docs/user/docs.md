@@ -101,3 +101,16 @@ Response
 - { "message": "incorrect password", "status": 401 } if wrong password - for activity = "update"
 - { "message": "invalid token", "status": 400 } if token expired/invalid - for activity = "update"
 - { "message": "invalid activity", "status": 400 } if activity is neither "update" nor "token"
+
+#### POST `/user/google/`
+Data to be sent in this format
+```
+{
+  "code": "string"
+}
+```
+On hitting the endpoint
+Response
+- { 'token': 'string', 'message': 'string', 'name': 'string', 'email': 'string', "status": 200 } if successful
+- { 'message': 'wrong or expired google token', "status": 401 } if token is invalid/expired
+
