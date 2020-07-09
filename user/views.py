@@ -49,7 +49,7 @@ class Signup(APIView):
         html_message = render_to_string('email_verification.html', {
                                         'url_value': verification_url, 'name': request.data['name']})
         plain_message = strip_tags(html_message)
-        subject = 'Verification for Talentize.ai'
+        subject = 'Verify your email || Numo Uno'
         try:
             send_mail(
                 subject,
