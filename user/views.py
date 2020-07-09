@@ -239,26 +239,25 @@ class GoogleOAuth(APIView):
         r2 = requests.get(
             'https://www.googleapis.com/oauth2/v2/userinfo', params=new_payload)
         data = (r2.text)
-        print(data)
-        return Response({'kuch_mat' : data}, status=status.HTTP_202_ACCEPTED)
-        # if 'error' in data:
-        #     return Response({'message': 'wrong or expired google token'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        # try:
-        #     user = User.objects.filter(email=data['email'])
-        #     message = 'success'
-        # except User.DoesNotExist:
-        #     user = User()
-        #     user.name = data['name']
-        #     user.email = data['email']
-        #     user.password_hash = make_password(
-        #         BaseUserManager().make_random_password())
-        #     user.save()
-        #     message = 'new user'
+        if 'error' in data:
+            return Response({'message': 'wrong or expired google token'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        # token = jwt.encode({'email': data['email'], 'random': str(
-        #     datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
-        # return Response({'token': token, 'message': message, 'name': data['name'], 'email': data['email']}, status=status.HTTP_202_ACCEPTED)
+        try:
+            user = User.objects.get(email=data['email'])
+            message = 'success'
+        except:
+            user = User()
+            user.name = data['name']
+            user.email = data['email']
+            user.password_hash = make_password(
+                BaseUserManager().make_random_password())
+            user.save()
+            message = 'new user'
+
+        token = jwt.encode({'email': data['email'], 'random': str(
+            datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
+        return Response({'token': token, 'message': message, 'name': data['name'], 'email': data['email']}, status=status.HTTP_200_OK)
 
 
 class LinkedinOAuth(APIView):
