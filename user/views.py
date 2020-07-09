@@ -246,7 +246,8 @@ class GoogleOAuth(APIView):
         try:
             user = User.objects.get(email=data['email'])
             message = 'success'
-        except:
+        except Exception as e:
+            print(e)
             user = User()
             user.name = data['name']
             user.email = data['email']
