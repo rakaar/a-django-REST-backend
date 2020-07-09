@@ -4,7 +4,7 @@ SECRET_KEY_FOR_JWT = 'SECRET_KEY'
 
 MESIBO_APP_ID = "8117"
 MESIBO_APPTOKEN = 'q6qk2jt17bu19y0nbscbl7l51g9jfo3gufuoxizctlfhh0fs2ggqolzlr10uf5dh'
-
+YOUTUBE_API_ACCESS_KEY = 'AIzaSyBGq_zgNyrZRMAGq300lxKyUTCmcQRm9iw'
 
 def check_token(email, token):
     '''

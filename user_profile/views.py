@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from user.utils import check_token
+from user.utils import check_token, YOUTUBE_API_ACCESS_KEY
 from user.models import User
 
 from .models import OnlineCourse, Patent, Project, PoR, ResearchPaper, PrevIntern, Position, Competition, Certification, Skill, Place, Preferences, College, CollegeCourse
@@ -199,4 +199,13 @@ class ProPic(APIView):
             pro_pic = 'http://localhost:8000/media/' + str(user.profile.pro_pic)
             return Response({'pro_pic': pro_pic}, status=status.HTTP_200_OK)
             
-
+class Podcast(APIView):
+    '''
+    endpoint to recieve YT API access key
+    '''
+    
+    def get(self, request, format=None):
+        '''
+        GET endpoint to fetch YT API's access key
+        '''
+        return Response({'key':YOUTUBE_API_ACCESS_KEY}, status=stauts.HTTP_200_OK)
