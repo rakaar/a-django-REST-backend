@@ -233,13 +233,14 @@ class GoogleOAuth(APIView):
         r = requests.post(
             'https://www.googleapis.com/oauth2/v4/token', params=payload
         )
-        resp = (r.text)
-        print('RESPONSE 1 : ', resp)
-        return Response({'kuch_mat' : resp}, status=status.HTTP_202_ACCEPTED)
-        # r = requests.get(
-        #     'https://www.googleapis.com/oauth2/v2/userinfo', params=payload)
-        # data = json.loads(r.text)
+        resp = json.loads(r.text)
 
+        new_payload= {'access_token':resp["access_token"]}
+        r2 = requests.get(
+            'https://www.googleapis.com/oauth2/v2/userinfo', params=new_payload)
+        data = (r2.text)
+        print(data)
+        return Response({'kuch_mat' : data}, status=status.HTTP_202_ACCEPTED)
         # if 'error' in data:
         #     return Response({'message': 'wrong or expired google token'}, status=status.HTTP_401_UNAUTHORIZED)
 
