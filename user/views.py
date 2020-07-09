@@ -231,7 +231,7 @@ class GoogleOAuth(APIView):
                 }
         
         r = requests.post(
-            'https://oauth2.googleapis.com', params=payload
+            'https://www.googleapis.com/oauth2/v4/token', params=payload
         )
         resp = (r.text)
         print('RESPONSE 1 : ', resp)
