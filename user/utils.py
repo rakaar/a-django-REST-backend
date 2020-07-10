@@ -31,14 +31,14 @@ def is_token_valid(token, mins):
     decode_obj = jwt.decode(token, SECRET_KEY_FOR_JWT, algorithms=['HS256'])
     token_time = decode_obj['random']
     token_time = token_time.split('.')[0]
-    current_time =  str(datetime.now()).split('.')[0]
+    current_time =  str(datetime.now().timestamp()).split('.')[0]
     
-    fmt = '%Y-%m-%d %H:%M:%S'
-    token_time = datetime.strptime(token_time, fmt)
-    current_time = datetime.strptime(current_time, fmt)
+    # fmt = '%Y-%m-%d %H:%M:%S'
+    # token_time = datetime.strptime(token_time, fmt)
+    # current_time = datetime.strptime(current_time, fmt)
     
-    time_difference = current_time - token_time
-    time_difference_in_mins = time_difference.total_seconds()/60
+    time_difference = int(current_time) - int(token_time)
+    time_difference_in_mins = time_difference/60
     return time_difference_in_mins < mins
 
 
