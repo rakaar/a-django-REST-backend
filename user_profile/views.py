@@ -208,4 +208,4 @@ class Podcast(APIView):
         '''
         GET endpoint to fetch YT API's access key
         '''
-        return Response({'key':YOUTUBE_API_ACCESS_KEY}, status=stauts.HTTP_200_OK)
+        return Response({'key':YOUTUBE_API_ACCESS_KEY}, status=status.HTTP_200_OK)
