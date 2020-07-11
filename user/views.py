@@ -234,12 +234,12 @@ class GoogleOAuth(APIView):
             'https://www.googleapis.com/oauth2/v4/token', params=payload
         )
         resp = json.loads(r.text)
-        print(resp)
+
         new_payload= {'access_token':resp["access_token"]}
         r2 = requests.get(
             'https://www.googleapis.com/oauth2/v2/userinfo', params=new_payload)
         data = json.loads(r2.text)
-        print(data)
+
         if 'error' in data:
             return Response({'message': 'wrong or expired google token'}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -270,9 +270,7 @@ class LinkedinOAuth(APIView):
         '''
         function to handle POST request for Linkedin Oauth
         '''
-        # Tasks left:
-        # Fetching authorization code in frontend from linkedin
-        #  Fetching authorization token from frontend in request.data['auth_code']- 3 lines below this
+
         payload_for_token = {
             'grant_type': 'authorization_code',
             'code': request.data['auth_code'],
@@ -282,10 +280,12 @@ class LinkedinOAuth(APIView):
         }
         response_for_token = requests.post(
             'https://www.linkedin.com/oauth/v2/accessToken', data=payload_for_token)
+
         response_for_token = json.loads(response_for_token.text)
-        print("RESPONSE 1: ", response_for_token)
+
         if 'error' in response_for_token:
              return Response(response_for_token, status=status.HTTP_400_BAD_REQUEST)
+
         access_token = response_for_token['access_token']
 
         try:
@@ -294,32 +294,37 @@ class LinkedinOAuth(APIView):
                 'https://api.linkedin.com/v2/me', headers=headers)
             email_resp = requests.get(
                 'https://api.linkedin.com/v2/clientAwareMemberHandles?q=members&projection=(elements*(primary,EMAIL,handle~))', headers=headers)
+
             response_for_data = json.loads(response_for_data.text)
             email_resp = json.loads(email_resp.text)
-            print("RESPONSE 2: ", response_for_data)
-            print("RESPONSE 3: ", email_resp)
+
             if 'error' in response_for_data:
                 return Response(response_for_data, status=status.HTTP_400_BAD_REQUEST)
         except:
             return Response({'message': 'cant connect to linkedin API'}, status=status.HTTP_401_UNAUTHORIZED)
-        return Response(response_for_data, status=status.HTTP_200_OK)
-
-        email = response_for_data['email']
+        
+        first_name = response_for_data['localizedFirstName'] 
+        last_name = response_for_data['localizedLastName']
+        
+        if 'elements' in email_resp and 'handle~' in email_resp['elements'][0]:
+            email = email_resp['elements'][0]['handle~']['emailAddress']
+        else :
+            email = first_name + '@' + last_name + '.linkedin'
         try:
-            user = User.objects.get(email=data['email'])
+            user = User.objects.get(email=email)
             message = 'success'
         except User.DoesNotExist:
             user = User()
-            user.name = data['name']
-            user.email = data['email']
+            user.name = first_name + ' ' + last_name
+            user.email = email
             user.password_hash = make_password(
                 BaseUserManager().make_random_password())
             user.save()
             message = 'new user'
 
-        token = jwt.encode({'email': response_for_data['email'], 'random': str(
+        token = jwt.encode({'email': email, 'random': str(
             datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
-        return Response({'token': token, 'message': message, 'name': response_for_data['name'], 'email': response_for_data['email']}, status=status.HTTP_202_ACCEPTED)
+        return Response({'token': token, 'message': message, 'name': user.name, 'email': email}, status=status.HTTP_202_ACCEPTED)
 
 
 class AppleOAuth(APIView):
