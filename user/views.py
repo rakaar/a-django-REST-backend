@@ -313,7 +313,8 @@ class LinkedinOAuth(APIView):
         try:
             user = User.objects.get(email=email)
             message = 'success'
-        except User.DoesNotExist:
+        except Exception as e:
+            print(e)
             user = User()
             user.name = first_name + ' ' + last_name
             user.email = email
