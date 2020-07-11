@@ -274,27 +274,39 @@ class LinkedinOAuth(APIView):
         # Fetching authorization code in frontend from linkedin
         #  Fetching authorization token from frontend in request.data['auth_code']- 3 lines below this
         payload_for_token = {
-            'grant_type': 'code',
+            'grant_type': 'authorization_code',
             'code': request.data['auth_code'],
-            'redirect_uri': 'frontend.com/profile',
-            'client_id': 'CLIENT_ID_FROM_LINEKDIN DEV',
-            'client_secret': 'FROM LINEKDIN DEV'
+            'redirect_uri': 'http://localhost:3000/linkedin/oauth',
+            'client_id': '86xf715eukfj9l',
+            'client_secret': 'oYZDeGsrE6Q5kNKF'
         }
         response_for_token = requests.post(
             'https://www.linkedin.com/oauth/v2/accessToken', data=payload_for_token)
         response_for_token = json.loads(response_for_token.text)
+        print("RESPONSE 1: ", response_for_token)
+        if 'error' in response_for_token:
+             return Response(response_for_token, status=status.HTTP_400_BAD_REQUEST)
         access_token = response_for_token['access_token']
 
         try:
+            headers ={ "Authorization": "Bearer "+ access_token}
             response_for_data = requests.get(
-                'https://api.linkedin.com/v2/me/~format=json?oauth2_access_token='+access_token)
+                'https://api.linkedin.com/v2/me', headers=headers)
+            email_resp = requests.get(
+                'https://api.linkedin.com/v2/clientAwareMemberHandles?q=members&projection=(elements*(primary,EMAIL,handle~))', headers=headers)
             response_for_data = json.loads(response_for_data.text)
+            email_resp = json.loads(email_resp.text)
+            print("RESPONSE 2: ", response_for_data)
+            print("RESPONSE 3: ", email_resp)
+            if 'error' in response_for_data:
+                return Response(response_for_data, status=status.HTTP_400_BAD_REQUEST)
         except:
             return Response({'message': 'cant connect to linkedin API'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(response_for_data, status=status.HTTP_200_OK)
 
         email = response_for_data['email']
         try:
-            user = User.objects.filter(email=data['email'])
+            user = User.objects.get(email=data['email'])
             message = 'success'
         except User.DoesNotExist:
             user = User()

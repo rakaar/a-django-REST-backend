@@ -8,7 +8,7 @@ urlpatterns = [
     path('forgot/', views.ForgotPassword.as_view(), name='forgot_password'),
     path('reset/', views.ResetPassword.as_view(), name='reset_password'),
     path('google/', views.GoogleOAuth.as_view(), name='google'),
-    path('apple/redirect/', views.AppleOAuth, name='apple-oauth'),
+    path('linkedin/', views.LinkedinOAuth.as_view(), name='linkedin-oauth'),
     path('apple/<str:sub>', views.AppleUserToProfile, name='apple-profile'),
     path('group/recent/', views.ReadBy.as_view(), name='recent')
 ]
