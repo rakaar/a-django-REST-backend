@@ -14,9 +14,9 @@ class Profile(APIView):
     Endpoint to get all profile details
     '''
 
-    def get(self, request, format=None):
+    def post(self, request, format=None):
         '''
-        handle request to GET profile
+        handle request to POST profile
             verify user and returns user profile details
         '''
         email = request.data['email']
@@ -30,7 +30,7 @@ class Profile(APIView):
         else:
             profile = user.profile
             name = user.name
-            return Response({'profile': profile, 'name': name}, status=status.HTTP_200_OK)
+            return Response({'name': name}, status=status.HTTP_200_OK)
 
 
 class Education(APIView):
