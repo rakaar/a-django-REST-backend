@@ -29,7 +29,8 @@ class Profile(APIView):
             return Response({'message': 'invalid user'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
             profile = user.profile
-            return Response(profile, status=status.HTTP_200_OK)
+            name = user.name
+            return Response({'profile': profile, 'name': name}, status=status.HTTP_200_OK)
 
 
 class Education(APIView):
