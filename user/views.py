@@ -36,7 +36,7 @@ class Signup(APIView):
         function to handle signup 
             send verification email to user
         '''
-        already_exists = User.objects.filter(email=request.data['email'])
+        already_exists = User.objects.get(email=request.data['email'])
         if already_exists:
             return Response({'message': 'already exists'}, status=status.HTTP_409_CONFLICT)
         data = request.data
@@ -99,6 +99,9 @@ class Verify(APIView):
                 return Response({'message': 'link expired'}, status=status.HTTP_410_GONE)
             user_data = jwt.decode(decoded_hashed_code.encode(),
                                 SECRET_FOR_JWT, algorithms=['HS256'])
+            already_exists = User.objects.get(email=user_data['email'])
+            if already_exists:
+                return Response({'message': 'already exists'}, status=status.HTTP_409_CONFLICT)
             original_password = user_data['password_hash']
             password_hash = sha256(original_password.encode()).hexdigest()
             # Obtain mesibo access token

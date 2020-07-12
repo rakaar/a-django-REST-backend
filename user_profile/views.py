@@ -24,7 +24,7 @@ class Profile(APIView):
             return Response({'message': 'invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            user = User.objects.filter(email=email)[0]
+            user = User.objects.get(email=email)
         except User.DoesNotExist:
             return Response({'message': 'invalid user'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
