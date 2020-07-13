@@ -229,7 +229,7 @@ class GoogleOAuth(APIView):
         payload = {'code': auth_code,
                     'client_id':'939204723287-lr57oipdf4ifpbor35p0i1jdrq8708jc.apps.googleusercontent.com',
                     'client_secret':'JKcjiVojOIyHu6f0kyMS6mjx',
-                    'redirect_uri':'http://localhost:3000/google/oauth',
+                    'redirect_uri':'https://master.d1irig95qyvz8m.amplifyapp.com/google/oauth',
                     'grant_type':'authorization_code'
                 }
         
@@ -277,7 +277,7 @@ class LinkedinOAuth(APIView):
         payload_for_token = {
             'grant_type': 'authorization_code',
             'code': request.data['auth_code'],
-            'redirect_uri': 'http://localhost:3000/linkedin/oauth',
+            'redirect_uri': 'https://master.d1irig95qyvz8m.amplifyapp.com/linkedin/oauth',
             'client_id': '86xf715eukfj9l',
             'client_secret': 'oYZDeGsrE6Q5kNKF'
         }
