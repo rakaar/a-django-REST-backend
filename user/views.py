@@ -36,11 +36,7 @@ class Signup(APIView):
         function to handle signup 
             send verification email to user
         '''
-        try:
-            already_exists = User.objects.get(email=request.data['email'])
-        except Exception as e:
-            print('Error in Signup ',e)
-            print('already_exists ', already_exists)
+        already_exists = User.objects.filter(email=request.data['email']).first()
         if already_exists:
             return Response({'message': 'already exists'}, status=status.HTTP_409_CONFLICT)
         data = request.data
@@ -79,8 +75,8 @@ class Login(APIView):
         '''
         password_hash = sha256(request.data['password'].encode()).hexdigest()
         email = request.data['email']
-        user = User.objects.filter(email=email, password_hash=password_hash)
-        if not len(user):
+        user = User.objects.filter(email=email, password_hash=password_hash).first()
+        if not user:
             return Response({'message': 'invalid creds'}, status=status.HTTP_401_UNAUTHORIZED)
         token = jwt.encode({'email': email, 'random': str(
             datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
@@ -103,7 +99,7 @@ class Verify(APIView):
                 return Response({'message': 'link expired'}, status=status.HTTP_410_GONE)
             user_data = jwt.decode(decoded_hashed_code.encode(),
                                 SECRET_FOR_JWT, algorithms=['HS256'])
-            already_exists = User.objects.get(email=user_data['email'])
+            already_exists = User.objects.filter(email=user_data['email']).first()
             if already_exists:
                 return Response({'message': 'already exists'}, status=status.HTTP_409_CONFLICT)
             original_password = user_data['password_hash']
@@ -254,7 +250,6 @@ class GoogleOAuth(APIView):
             user = User.objects.get(email=data['email'])
             message = 'success'
         except Exception as e:
-            print(e)
             user = User()
             user.name = data['name']
             user.email = data['email']
@@ -321,7 +316,6 @@ class LinkedinOAuth(APIView):
             user = User.objects.get(email=email)
             message = 'success'
         except Exception as e:
-            print(e)
             user = User()
             user.name = first_name + ' ' + last_name
             user.email = email
