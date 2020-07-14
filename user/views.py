@@ -326,7 +326,7 @@ class LinkedinOAuth(APIView):
 
         token = jwt.encode({'email': email, 'random': str(
             datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
-        return Response({'token': token, 'message': message, 'name': user.name, 'email': email}, status=status.HTTP_202_ACCEPTED)
+        return Response({'token': token, 'message': message, 'name': user.name, 'email': email}, status=status.HTTP_200_OK)
 
 
 class AppleOAuth(APIView):
