@@ -54,7 +54,7 @@ class Signup(APIView):
             send_mail(
                 subject,
                 plain_message,
-                'contact@numouno.tech',
+                'Numo Uno <contact@numouno.tech>',
                 [request.data['email']],
                 html_message=html_message
             )
