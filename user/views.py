@@ -36,7 +36,11 @@ class Signup(APIView):
         function to handle signup 
             send verification email to user
         '''
-        already_exists = User.objects.get(email=request.data['email'])
+        try:
+            already_exists = User.objects.get(email=request.data['email'])
+        except Exception as e:
+            print('Error in Signup ',e)
+            print('already_exists ', already_exists)
         if already_exists:
             return Response({'message': 'already exists'}, status=status.HTTP_409_CONFLICT)
         data = request.data
