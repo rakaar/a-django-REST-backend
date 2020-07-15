@@ -96,7 +96,7 @@ Data to be sent in this format
 ```
 On hitting the endpoint
 Response
-- { "message": "success", "status": 200 } if successful
+- { "message": "success", "token": "string - token", "status": 200 } if successful
 - { "message": "invalid token", "status": 400 } if token is invalid for the given email - for activity = "token"
 - { "message": "incorrect password", "status": 401 } if wrong password - for activity = "update"
 - { "message": "invalid token", "status": 400 } if token expired/invalid - for activity = "update"
