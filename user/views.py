@@ -141,7 +141,7 @@ class ForgotPassword(APIView):
         function to handle POST request to set new password
         '''
         email = request.data['email']
-        if activity == "forgot":
+        if request.data['activity'] == "forgot":
             try:
                 user = User.objects.get(email=email)
             except Exception as e:
@@ -169,7 +169,7 @@ class ForgotPassword(APIView):
                 logger.error('Error in SignUp POST is ', e)
                 return Response({'message': 'invalid email'}, status=status.HTTP_400_BAD_REQUEST)
 
-        elif activity == "update":
+        elif request.data['activity'] == "update":
             token = request.data['token']
             token = token.replace('__', '.')
             email = jwt.decode(token, SECRET_KEY_FOR_JWT,
