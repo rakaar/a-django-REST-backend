@@ -140,8 +140,9 @@ class ForgotPassword(APIView):
         '''
         function to handle POST request to set new password
         '''
-        email = request.data['email']
+        
         if request.data['activity'] == "forgot":
+            email = request.data['email']
             try:
                 user = User.objects.get(email=email)
             except Exception as e:
