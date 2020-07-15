@@ -152,7 +152,7 @@ class ForgotPassword(APIView):
                 token = jwt.encode({'email': email, 'random': str(
                     datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
                 token = token.replace('.', '__')
-                reset_url = 'localhost:3000/forget/' + token
+                reset_url = 'http://localhost:3000/forget/' + token
                 html_message = render_to_string('forgot_password.html', {
                                         'url_value': reset_url, 'name': user.name})
                 plain_message = strip_tags(html_message)
