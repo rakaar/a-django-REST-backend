@@ -173,7 +173,7 @@ class ForgotPassword(APIView):
         elif request.data['activity'] == "update":
             token = request.data['token']
             token = token.replace('__', '.')
-            email = jwt.decode(token, SECRET_KEY_FOR_JWT,
+            email = jwt.decode(token, SECRET_FOR_JWT,
                                algorithms=['HS256'])['email']
             new_password = request.data['password']
             if not is_token_valid(token, 10):
