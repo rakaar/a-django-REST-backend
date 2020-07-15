@@ -151,10 +151,16 @@ class ForgotPassword(APIView):
             try:
                 token = jwt.encode({'email': email, 'random': str(
                     datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
+                token = token.replace('.', '__')
+                reset_url = 'localhost:3000/forget/' + token
+                html_message = render_to_string('forgot_password.html', {
+                                        'url_value': reset_url, 'name': user.name})
+                plain_message = strip_tags(html_message)
+                subject = "Password Reset || Numo Uno"
                 send_mail(
-                    'Password Reset for Talentize',
-                    'Here is a URL - Frotnend.com/forget/' + token,
-                    'llr.hall.complaints@gmail.com',
+                    subject,
+                    plain_message,
+                    'Numo Uno <contact@numouno.tech>',
                     [request.data['email']],
                     html_message=html_message
                 )
@@ -165,6 +171,7 @@ class ForgotPassword(APIView):
 
         elif activity == "update":
             token = request.data['token']
+            token = token.replace('__', '.')
             email = jwt.decode(token, SECRET_KEY_FOR_JWT,
                                algorithms=['HS256'])['email']
             new_password = request.data['password']
@@ -194,7 +201,7 @@ class ResetPassword(APIView):
             if check_token(data['email'], data['token']):
                 token = jwt.encode({'email': data['email'], 'random': str(
                     datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
-                return Response({'message': 'success'}, status=status.HTTP_200_OK)
+                return Response({'message': 'success', 'token': token}, status=status.HTTP_200_OK)
             else:
                 return Response({'message': 'invalid token'}, status=status.HTTP_400_BAD_REQUEST)
         elif data['activity'] == 'update':
