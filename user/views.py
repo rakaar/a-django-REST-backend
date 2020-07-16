@@ -9,6 +9,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+import os
 from hashlib import sha256
 import jwt
 import requests
@@ -236,7 +237,7 @@ class GoogleOAuth(APIView):
         auth_code = request.data["code"]    
         payload = {'code': auth_code,
                     'client_id':'939204723287-lr57oipdf4ifpbor35p0i1jdrq8708jc.apps.googleusercontent.com',
-                    'client_secret':'JKcjiVojOIyHu6f0kyMS6mjx',
+                    'client_secret': os.environ.get('GOOGLE_CLIENT_SECRET'),
                     'redirect_uri':'https://master.d1irig95qyvz8m.amplifyapp.com/google/oauth',
                     'grant_type':'authorization_code'
                 }
@@ -286,7 +287,7 @@ class LinkedinOAuth(APIView):
             'code': request.data['auth_code'],
             'redirect_uri': 'https://master.d1irig95qyvz8m.amplifyapp.com/linkedin/oauth',
             'client_id': '86xf715eukfj9l',
-            'client_secret': 'oYZDeGsrE6Q5kNKF'
+            'client_secret': os.environ.get('LINKEDIN_CLIENT_SECRET')
         }
         response_for_token = requests.post(
             'https://www.linkedin.com/oauth/v2/accessToken', data=payload_for_token)
