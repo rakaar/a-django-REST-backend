@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'hkbk-$mfsayergpivxp4u#$6%4d5@lgx_9twlascbyb#_y4*^$'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -161,7 +161,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 #Django MAIL
 EMAIL_HOST_USER  = 'contact@numouno.tech'
-EMAIL_HOST_PASSWORD = 'Mrjaroemail1'
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 EMAIL_HOST = 'smtp.numouno.tech'
 EMAIL_PORT =  587
 EMAIL_USE_TLS = True

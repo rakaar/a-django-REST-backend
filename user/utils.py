@@ -1,10 +1,11 @@
+import os
 import jwt
 from datetime import datetime
-SECRET_KEY_FOR_JWT = 'SECRET_KEY'
+
+SECRET_KEY_FOR_JWT = os.environ.get('SECRET_FOR_JWT')
 
 MESIBO_APP_ID = "8117"
-MESIBO_APPTOKEN = 'q6qk2jt17bu19y0nbscbl7l51g9jfo3gufuoxizctlfhh0fs2ggqolzlr10uf5dh'
-YOUTUBE_API_ACCESS_KEY = 'AIzaSyDBPbtMEZjyMPFIUTml5w196GiHALhLGDU'
+MESIBO_APPTOKEN = os.environ.get('MESIBO_APP_TOKEN')
 
 def check_token(email, token):
     '''

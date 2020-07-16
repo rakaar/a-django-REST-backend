@@ -241,6 +241,3 @@ Responses
 - { "message": "invalid token", "status": 400 } if token is not right
 - { "message": "invalid user", "status": 401 } if user not found in Data
 
-#### GET `/profile/podcast/` (To get the youtube api access key)
-Responses
-- { 'key':<YOUTUBE_API_ACCESS_KEY> } if everything is fine
