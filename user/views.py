@@ -16,7 +16,7 @@ import requests
 import json
 import base64
 from datetime import datetime
-from logging import getLogger
+import logging
 
 from .serializers import UserSerializer
 from .models import User, LastSeen, MesiboUser
@@ -24,7 +24,9 @@ from chat.models import Group, Mail
 from user_profile.models import Profile
 from .utils import check_token, is_token_valid, MESIBO_APP_ID, MESIBO_APPTOKEN
 from .utils import SECRET_KEY_FOR_JWT as SECRET_FOR_JWT
-logger = getLogger(__name__)
+
+logging.config.fileConfig('logs/config.ini')
+logger = logging.getLogger(__name__)
 
 
 class Signup(APIView):
@@ -61,7 +63,7 @@ class Signup(APIView):
             )
             return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
         except Exception as e:
-            logger.error('Error in SignUp POST is ', e)
+            logger.error('Error in SignUp POST is ', exc_info=1)
             return Response({'message': 'invalid email'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -113,12 +115,12 @@ class Verify(APIView):
                 "appid": MESIBO_APP_ID
             }
         except Exception as e:
-            logger.error('Error in Verify GET is ', e)
+            logger.error('Error in Verify GET is ', exc_info=1)
             return Response({'message':'data error'}, status=status.HTTP_400_BAD_REQUEST)
         try:
             res = requests.post('https://api.mesibo.com/api.php', data=data)
         except Exception as e:
-            logger.error('Error in Verify GET is ', e)
+            logger.error('Error in Verify GET is ', exc_info=1)
             return Response({'message':'mesibo failure'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         mesibo_uid = res.json()['user']['uid']
         mesibo_token = res.json()['user']['token']
@@ -128,7 +130,7 @@ class Verify(APIView):
             user.save()
             return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
         except Exception as e:
-            logger.error('Error in Verify GET is ', e)
+            logger.error('Error in Verify GET is ', exc_info=1)
             return Response({'message':'db failure'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -147,7 +149,7 @@ class ForgotPassword(APIView):
             try:
                 user = User.objects.get(email=email)
             except Exception as e:
-                logger.error('Not found user: ', email, ' err: ', e)
+                logger.error('Error in ForgotPassword POST is Not found user: {}'.format(email), exc_info=1)
                 return Response({'message': 'not found'}, status=status.HTTP_400_BAD_REQUEST)
 
             try:
@@ -168,7 +170,7 @@ class ForgotPassword(APIView):
                 )
                 return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
             except Exception as e:
-                logger.error('Error in SignUp POST is ', e)
+                logger.error('Error in ForgotPassword POST is ', exc_info=1)
                 return Response({'message': 'invalid email'}, status=status.HTTP_400_BAD_REQUEST)
 
         elif request.data['activity'] == "update":
@@ -185,7 +187,7 @@ class ForgotPassword(APIView):
                 user.save()
                 return Response({'message': 'success'}, status=status.HTTP_200_OK)
             except Exception as e:
-                logger.error('Error in forget password is ', e)
+                logger.error('Error in ForgotPassword POST is ', exc_info=1)
                 return Response({'message': 'failure'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -383,7 +385,7 @@ class AppleUserToProfile(APIView):
                 datetime.now().timestamp())}, SECRET_FOR_JWT, algorithm='HS256').decode()
             return Response({'message': 'success', 'token': token}, status=status.HTTP_200_OK)
         except Exception as e:
-            logger.error('Error in AppleUserToProfile POST is ', e)
+            logger.error('Error in AppleUserToProfile POST is ', exc_info=1)
             return Response({'message': 'Invalid user'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -422,7 +424,7 @@ class ReadBy(APIView):
 
             return Response({'read_by': u_names}, status=status.HTTP_200_OK)
         except Exception as e:
-            logger.error('Error in ReadBy GET is ', e)
+            logger.error('Error in ReadBy GET is ', exc_info=1)
             return Response({'message': 'not found'}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, format=None):
@@ -490,5 +492,5 @@ class ReadBy(APIView):
                     return Response({'message': 'suceess'}, status=status.HTTP_200_OK)
 
         except Exception as e:
-            logger.error('Error in ReadBy POST is ', e)
+            logger.error('Error in ReadBy POST is ', exc_info=1)
             return Response({'message': 'error'}, status=status.HTTP_400_BAD_REQUEST)
