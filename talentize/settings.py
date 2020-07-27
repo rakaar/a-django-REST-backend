@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     
     # Applications 
     'user.apps.UserConfig',
+    'features.apps.FeaturesConfig',
     'user_profile.apps.UserProfileConfig',
     'chat.apps.ChatConfig',
     
