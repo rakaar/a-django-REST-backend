@@ -21,5 +21,5 @@ class LearnerList(models.Model):
     category = models.CharField(max_length=2000, blank=False)
     experience = models.ArrayField(model_container=Experience, blank=False)
     podcast = models.CharField(max_length=5000, blank=True)
-    resources = models.ArrayField(model_container=Resource, blank=False)
+    resources = models.ArrayField(model_container=Resource, blank=True)
 
