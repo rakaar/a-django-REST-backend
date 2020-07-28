@@ -26,6 +26,9 @@ class AllLearnLists(APIView):
 				"id": learn_list.id,
 				"person": {
 					"name": learn_list.person_name,
+					"fb": learn_list.person_fb,
+					"linkedin": learn_list.person_linkedin,
+					"numouno": learn_list.person_numouno,
 					"pic": "https://api.numouno.tech/media/"+str(learn_list.person_pic)
 				},
 				"category": learn_list.category,
@@ -64,7 +67,11 @@ class IndivLearnList(APIView):
 		learn_list_dict = {
 			"id": learn_list.id,
 			"person": {
+				
 				"name": learn_list.person_name,
+				"fb": learn_list.person_fb,
+				"linkedin": learn_list.person_linkedin,
+				"numouno": learn_list.person_numouno,
 				"pic": "https://api.numouno.tech/media/"+str(learn_list.person_pic)
 			},
 			"category": learn_list.category,
