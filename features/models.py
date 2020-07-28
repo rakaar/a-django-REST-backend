@@ -17,6 +17,9 @@ class Resource(models.Model):
 
 class LearnerList(models.Model):
     person_name = models.CharField(max_length=200, blank=False)
+    person_fb = models.CharField(max_length=500, blank=True)
+    person_linkedin = models.CharField(max_length=500, blank=True)
+    person_numouno = models.CharField(max_length=500, blank=True)
     person_pic = models.ImageField(blank=True, null=True,upload_to=upload_path_person)
     category = models.CharField(max_length=2000, blank=False)
     experience = models.ArrayField(model_container=Experience, blank=False)
