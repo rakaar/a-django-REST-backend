@@ -8,6 +8,9 @@ To fetch all the learn lists metadata(excluding resources)
 	 "id": number,
         "person": {
             "name": "string",
+            "fb": "string",
+			"linkedin": "string",
+			"numouno": "string",
             "pic": "string"
         },
         "category": "string",
@@ -27,6 +30,9 @@ To get complete data of a single learn list
 	 "id": number,
         "person": {
             "name": "string",
+            "fb": "string",
+			"linkedin": "string",
+			"numouno": "string",
             "pic": "string"
         },
         "category": "string",
