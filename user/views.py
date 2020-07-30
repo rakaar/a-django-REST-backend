@@ -43,6 +43,7 @@ class Signup(APIView):
         if already_exists:
             return Response({'message': 'already exists'}, status=status.HTTP_409_CONFLICT)
         data = request.data
+        data['password_hash'] = sha256(data['password_hash'].encode()).hexdigest()
         data['random'] = str(datetime.now().timestamp())
         encoded_url_verification_param = jwt.encode(
             data, SECRET_FOR_JWT, algorithm='HS256').decode()
@@ -105,8 +106,7 @@ class Verify(APIView):
             already_exists = User.objects.filter(email=user_data['email']).first()
             if already_exists:
                 return Response({'message': 'already exists'}, status=status.HTTP_409_CONFLICT)
-            original_password = user_data['password_hash']
-            password_hash = sha256(original_password.encode()).hexdigest()
+            password_hash = user_data['password_hash']
             # Obtain mesibo access token
             data = {
                 "op": "useradd",
