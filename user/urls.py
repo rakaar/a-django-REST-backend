@@ -10,5 +10,6 @@ urlpatterns = [
     path('google/', views.GoogleOAuth.as_view(), name='google'),
     path('linkedin/', views.LinkedinOAuth.as_view(), name='linkedin-oauth'),
     path('apple/<str:sub>', views.AppleUserToProfile, name='apple-profile'),
-    path('group/recent/', views.ReadBy.as_view(), name='recent')
+    path('group/recent/', views.ReadBy.as_view(), name='recent'),
+    path('newsletter/', views.NewsLetter.as_view(), name='news_letter')
 ]

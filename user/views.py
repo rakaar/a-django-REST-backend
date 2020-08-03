@@ -22,7 +22,7 @@ from .serializers import UserSerializer
 from .models import User, LastSeen, MesiboUser
 from chat.models import Group, Mail
 from user_profile.models import Profile
-from .utils import check_token, is_token_valid, MESIBO_APP_ID, MESIBO_APPTOKEN
+from .utils import check_token, is_token_valid, MESIBO_APP_ID, MESIBO_APPTOKEN,  SENDGRID_API_KEY
 from .utils import SECRET_KEY_FOR_JWT as SECRET_FOR_JWT
 
 logging.config.fileConfig('logs/config.ini')
@@ -127,12 +127,29 @@ class Verify(APIView):
         try:
             user = User(name=user_data['name'],email=user_data['email'], password_hash=password_hash, insti_email=user_data['insti_email'], mesibo_details=MesiboUser(uid=mesibo_uid,
                             access_token=mesibo_token), profile=Profile())
-            user.save()
-            return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
+            user.save() 
         except Exception as e:
             logger.error('Error in Verify GET is ', exc_info=1)
             return Response({'message':'db failure'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+        try:
+            subscriber_data = {
+                "first_name" : user_data['name'],
+                "email" : user_data['email']
+            }
+            content = {
+            "list_ids": ["97cf46e3-e52f-4a9f-b43f-42f5edc02632"],
+            "contacts": [subscriber_data]
+            }
+            headers = {
+                "Authorization":"Bearer {}".format(SENDGRID_API_KEY),
+                "Content-Type" : "application/json"
+            }
+            r = requests.put('https://api.sendgrid.com/v3/marketing/contacts', json=content, headers=headers)
+            return Response({'message': 'success'}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            logger.error('Error in Verify POST is ', exc_info=1)
+            return Response({'message': 'not subscribed'}, status=status.HTTP_201_CREATED)
+            
 
 class ForgotPassword(APIView):
     '''
@@ -494,3 +511,47 @@ class ReadBy(APIView):
         except Exception as e:
             logger.error('Error in ReadBy POST is ', exc_info=1)
             return Response({'message': 'error'}, status=status.HTTP_400_BAD_REQUEST)
+
+class NewsLetter(APIView):
+    '''
+    Endpoint to handle NewsLetter Subscribers
+    '''
+
+    def post(self, request, format=None):
+        '''
+        function to add user to newsletter subscribers list
+        '''
+        data = request.data
+        content = {
+            "list_ids": ["97cf46e3-e52f-4a9f-b43f-42f5edc02632"],
+            "contacts": [data]
+        }
+        headers = {
+            "Authorization":"Bearer {}".format(SENDGRID_API_KEY),
+            "Content-Type" : "application/json"
+        }
+        try:
+            r = requests.put('https://api.sendgrid.com/v3/marketing/contacts', json=content, headers=headers)
+            if r.status_code != 202:
+                logger.error("Issue with SendGrid : {}".format(r.text), exc_info=1)
+                return Response({'message': 'server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            logger.error('Error in NewsLetter POST is ', exc_info=1)
+            return Response({'message': 'bad data'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            html_message = render_to_string('new_subscriber.html', {'name': data['first_name']})
+            plain_message = strip_tags(html_message)
+            subject = "Welcome || Numo Uno"
+            send_mail(
+                subject,
+                plain_message,
+                'Numo Uno <contact@numouno.tech>',
+                [data['email']],
+                html_message=html_message
+            )
+            return Response({'message': 'suceess'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error('Error in NewsLetter POST is ', exc_info=1)
+            return Response({'message': 'invalid email'}, status=status.HTTP_400_BAD_REQUEST)
+
+

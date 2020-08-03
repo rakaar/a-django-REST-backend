@@ -3,6 +3,7 @@ import jwt
 from datetime import datetime
 
 SECRET_KEY_FOR_JWT = os.environ.get('SECRET_FOR_JWT')
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
 
 MESIBO_APP_ID = "8117"
 MESIBO_APPTOKEN = os.environ.get('MESIBO_APP_TOKEN')

@@ -19,8 +19,12 @@ Responses
 #### GET `/user/verify/<hashed_code>/`
 On hitting the link in the browser
 Responses
-- { "message": "success", "status": 201 } if successfully saved in databased
-- { "message": ERRORS, "status": 400 } if wrong URL is hit
+- { "message": "success", "status": 201 } if successfully saved in database
+- { 'message':'data error', "status": 400 } if wrong URL is hit
+- { "message":"mesibo failure", "status": 503 } if Mesibo fails
+- { "message": "already exists", "status": 409 } if User already exist
+- { "message": 'link expired', "status": 410 } if token/link expired
+- { "message": "not subscribed", "status": 201 } if successfully saved in database but not subscribed to NewsLetter
 
 #### POST `/user/login/`
 Data to be sent in this format
@@ -114,3 +118,20 @@ Response
 - { 'token': 'string', 'message': 'string', 'name': 'string', 'email': 'string', "status": 200 } if successful
 - { 'message': 'wrong or expired google token', "status": 401 } if token is invalid/expired
 
+#### POST `/user/news_letter/`
+Data to be sent in this format
+```
+{
+  "first_name": "string length b/w 3 to 50",
+  "email": "string@string.string",
+  "custom_fields": {
+		"contact": 9111(integer)
+	}
+
+}
+```
+Responses
+- { "message": "success", "status": 200 } if successful
+- { 'message': 'invalid email', "status": 400 } if mail is invalid
+- { 'message': 'bad data', "status": 400 } if user could not be added to subscribers list
+- { 'message': 'server error', "status": 500 } if issue with sendgrid
