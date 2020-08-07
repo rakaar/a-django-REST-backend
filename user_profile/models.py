@@ -3,92 +3,137 @@ from djongo import models
 
 class CollegeCourse(models.Model):
     name = models.CharField(max_length=200, blank=True)
+    description = models.CharField(max_length=1000, blank=True)
 
 
 class Position(models.Model):
-    year = models.CharField(max_length=10, blank=True)
-    description = models.CharField(max_length=200, blank=True)
+    position_held = models.CharField(max_length=200, blank=True)
+    year_in_college = models.IntegerField(blank=True)
+    duration = models.CharField(max_length=100, blank=True)
 
-
-class School(models.Model):
-    name = models.CharField(max_length=200, blank=True)
+class TwelthEdu(models.Model):
+    course_name = models.CharField(max_length=200, blank=True)
+    school = models.CharField(max_length=200, blank=True)
     board = models.CharField(max_length=200, blank=True)
-    percentage = models.CharField(max_length=10, blank=True)
+    start_date = models.CharField(max_length=200, blank=True)
+    end_date = models.CharField(max_length=200, blank=True)
+    is_cgpa= models.BooleanField(blank=True)
+    cg_or_percentage = models.CharField(max_length=200, blank=True)
+
+class SchoolEdu(models.Model):
+    course_name = models.CharField(max_length=200, blank=True)
+    school = models.CharField(max_length=200, blank=True)
+    board = models.CharField(max_length=200, blank=True)
+    start_date = models.CharField(max_length=200, blank=True)
+    end_date = models.CharField(max_length=200, blank=True)
+    is_cgpa= models.BooleanField(blank=True)
+    cg_or_percentage = models.CharField(max_length=200, blank=True)
 
 
 class College(models.Model):
+    course_name = models.CharField(max_length=200, blank=True)
+    course_type = models.CharField(max_length=200, blank=True)
     name = models.CharField(max_length=200,blank=True)
-    cgpa_range = models.CharField(max_length=200, blank=True)
     dept = models.CharField(max_length=200, blank=True)
-    core_courses = models.ArrayField(model_container=CollegeCourse, blank=True)
-    additional_courses = models.ArrayField(model_container=CollegeCourse, blank=True)
-    type_of_degree = models.CharField(max_length=200, blank=True)
+    is_cgpa= models.BooleanField(blank=True)
+    cg_or_percentage = models.CharField(max_length=200, blank=True)
     from_date = models.CharField(max_length=200, blank=True)
     to_date = models.CharField(max_length=200, blank=True)
-
-
-class Project(models.Model):
+    description = models.CharField(max_length=1000, blank=True) 
+    academic_courses = models.ArrayField(model_container=CollegeCourse, blank=True)
+    
+class SelfProject(models.Model):
     title = models.CharField(max_length=200, blank=True)
-    description = models.CharField(max_length=400, blank=True)
-    # prof / FTP / BTP,MTP / self
-    project_type = models.CharField(max_length=10, blank=True)
-    # prof_name / college_name / prof_name / null
-    associated_info = models.CharField(max_length=20, blank=True)
+    from_date = models.CharField(max_length=200, blank=True)
+    to_date = models.CharField(max_length=200, blank=True)
+    description = models.CharField(max_length=1000, blank=True)
 
-
-class ResearchPaper(models.Model):
+class AcademicProject(models.Model):
     title = models.CharField(max_length=200, blank=True)
-    description = models.CharField(max_length=400, blank=True)
-    journal = models.CharField(max_length=200, blank=True)
-    num_of_people = models.IntegerField(blank=True)
+    institute = models.CharField(max_length=250, blank=True)
+    prof = models.CharField(max_length=250, blank=True)
+    prof_google_scholar_link = models.CharField(max_length=250, blank=True)
+    from_date = models.CharField(max_length=200, blank=True)
+    to_date = models.CharField(max_length=200, blank=True)
+    description = models.CharField(max_length=1000, blank=True)
+
+class SelfResearchPaper(models.Model):
+    title = models.CharField(max_length=200, blank=True)
+    from_date = models.CharField(max_length=200, blank=True)
+    to_date = models.CharField(max_length=200, blank=True)
+    description = models.CharField(max_length=1000, blank=True)
     is_main = models.BooleanField(blank=True)
-    name_of_main = models.CharField(max_length=200, blank=True)
+    num_of_people = models.IntegerField(blank=True)
+    publication_name = models.CharField(max_length=200, blank=True)
+    publication_link = models.CharField(max_length=250, blank=True)
 
+class AcademicResearchPaper(models.Model):
+    title = models.CharField(max_length=200, blank=True)
+    institute = models.CharField(max_length=250, blank=True)
+    prof = models.CharField(max_length=250, blank=True)
+    prof_google_scholar_link = models.CharField(max_length=250, blank=True)
+    from_date = models.CharField(max_length=200, blank=True)
+    to_date = models.CharField(max_length=200, blank=True)
+    description = models.CharField(max_length=1000, blank=True)
+    is_main = models.BooleanField(blank=True)
+    num_of_people = models.IntegerField(blank=True)
+    publication_name = models.CharField(max_length=200, blank=True)
+    publication_link = models.CharField(max_length=250, blank=True)
 
 class PrevIntern(models.Model):
     company = models.CharField(max_length=200, blank=True)
     job_title = models.CharField(max_length=200, blank=True)
     from_date = models.CharField(max_length=200, blank=True)
     to_date = models.CharField(max_length=200, blank=True)
-    nature = models.CharField(max_length=10, blank=True)  # remote / direct
+    location = models.CharField(max_length=200, blank=True) 
+    year_in_college = models.IntegerField(blank=True)
+    description = models.CharField(max_length=1000, blank=True)
 
+class WorkExperience(models.Model):
+    company = models.CharField(max_length=200, blank=True)
+    job_title = models.CharField(max_length=200, blank=True)
+    from_date = models.CharField(max_length=200, blank=True)
+    to_date = models.CharField(max_length=200, blank=True)
+    location = models.CharField(max_length=200, blank=True)
+    description = models.CharField(max_length=1000, blank=True)
 
-class PoR(models.Model):
-    place = models.CharField(max_length=200, blank=True)  # name of soceity
+class PoR(models.Model): 
+    place = models.CharField(max_length=200, blank=True) 
     positions = models.ArrayField(model_container=Position, blank=True)
-
 
 class OnlineCourse(models.Model):
     name = models.CharField(max_length=200, blank=True)
     company = models.CharField(max_length=200, blank=True)
     partner_insti = models.CharField(max_length=200, blank=True)
-
+    description = models.CharField(max_length=1000, blank=True)
 
 class Certification(models.Model):
-    name = models.CharField(max_length=200, blank=True)
-    year = models.CharField(max_length=200, blank=True)
-    description = models.CharField(max_length=200, blank=True)
+    name = models.CharField(max_length=200, blank=True) 
+    issue_date = models.CharField(max_length=200, blank=True)
+    valid_till = models.CharField(max_length=200, blank=True)
+    description = models.CharField(max_length=1000, blank=True)
     issuing_auth = models.CharField(max_length=200, blank=True)
 
 class Skill(models.Model):
     name = models.CharField(max_length=200, blank=True)
 
-
 class Patent(models.Model):
     title = models.CharField(max_length=200, blank=True)
-    description = models.CharField(max_length=600, blank=True)
+    description = models.CharField(max_length=1000, blank=True)
     date = models.CharField(max_length=200, blank=True)
+    link = models.CharField(max_length=300, blank=True)
 
-class Competition(models.Model):
+class Competition(models.Model): 
     title = models.CharField(max_length=200, blank=True)
-    description = models.CharField(max_length=600, blank=True)
+    level = models.CharField(max_length=200, blank=True)
+    rank = models.CharField(max_length=200, blank=True)
     date = models.CharField(max_length=200, blank=True)
     issuing_auth = models.CharField(max_length=200, blank=True)
 
 class Place(models.Model):
     name = models.CharField(max_length=200, blank=True)
 
-class Preferences(models.Model):
+class Preferences(models.Model): 
     prefered_sectors = models.ArrayField(model_container=Place, blank=True)
     prefered_interns = models.ArrayField(model_container=Place, blank=True)
     prefered_jobs = models.ArrayField(model_container=Place, blank=True)
@@ -99,12 +144,17 @@ def upload_path(instance, filename):
 class Profile(models.Model):
     location = models.CharField(max_length=200, blank=True)
     bio = models.CharField(max_length=500, blank=True)
-    school = models.EmbeddedField(model_container=School, blank=True)
+    about = models.CharField(max_length=500, blank=True)
+    school = models.EmbeddedField(model_container=SchoolEdu, blank=True)
+    twelth = models.EmbeddedField(model_container=TwelthEdu, blank=True)
     colleges = models.ArrayField(model_container=College, blank=True)
-    projects = models.ArrayField(model_container=Project, blank=True)
-    research_papers = models.ArrayField(model_container=ResearchPaper, blank=True)
+    self_projects = models.ArrayField(model_container=SelfProject, blank=True)
+    academic_projects = models.ArrayField(model_container=AcademicProject, blank=True)
+    self_research_papers = models.ArrayField(model_container=SelfResearchPaper, blank=True)
+    academic_research_papers = models.ArrayField(model_container=AcademicResearchPaper, blank=True)
     patents = models.ArrayField(model_container=Patent, blank=True)
     prev_interns = models.ArrayField(model_container=PrevIntern, blank=True)
+    work_experience = models.ArrayField(model_container=WorkExperience, blank=True)
     por = models.ArrayField(model_container=PoR, blank=True)
     online_courses = models.ArrayField(model_container=OnlineCourse, blank=True)
     competitions = models.ArrayField(model_container=Competition, blank=True)
