@@ -10,6 +10,7 @@ class Position(models.Model):
     position_held = models.CharField(max_length=200, blank=True)
     year_in_college = models.IntegerField(blank=True)
     duration = models.CharField(max_length=100, blank=True)
+    description = models.CharField(max_length=1000, blank=True)
 
 class TwelthEdu(models.Model):
     course_name = models.CharField(max_length=200, blank=True)
