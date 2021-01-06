@@ -1,5 +1,3 @@
-#### Deployed @ https://api.numouno.tech/
-
 ### Installation and setup
 - Create a virtual environment using venv
 `python3 -m venv env`
